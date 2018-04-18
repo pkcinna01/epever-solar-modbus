@@ -6,7 +6,7 @@ Library (java jar) supporting communication with EPever solar charge controllers
 
 It uses [jlibmodbus](https://github.com/kochedykov/jlibmodbus) to send epever specific messages.
 
-### Note: Project is not functional (yet).
+### Note: Project has not yet implemented read coils or write registers.
 
 
 ## Motivation
