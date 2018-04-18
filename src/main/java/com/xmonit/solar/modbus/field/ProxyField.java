@@ -33,36 +33,6 @@ public abstract class ProxyField<T> {
     protected LocalDateTime commitTime;
     protected ChargeController chargeController;
 
-    public boolean isCoilBacked() {
-        return addr < 0x1000;
-    }
-    public boolean isDescreteInputRegisterBacked() {
-        return addr >= 0x1000 && addr < 0x3000;
-    }
-    public boolean isInputRegisterBacked() {
-        return addr >= 0x3000 && addr < 0x9000;
-    }
-    public boolean isHoldingRegisterBacked() {
-        return addr >= 0x9000;
-    }
-
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Map<String,Object> getMetaData() {
-        return new HashMap<String,Object>(){{
-            put("addr",addr);
-            put("unit", unit.abbr);
-            put("name",name);
-            put("description",getDescription());
-            put("registerCount",registerCount);
-            put("denominator", denominator);
-
-        }};
-    }
-
     public ProxyField(int addr, Unit unit, String name, String description, int denominator, int registerCount) {
         this.addr = addr;
         this.unit = unit;
@@ -80,14 +50,46 @@ public abstract class ProxyField<T> {
         this(addr, unit, name, description, denominator, 1);
     }
 
+    abstract public T fromRegisters(int[] registers);
+
+    abstract public int[] toRegisters(T val);
+
+    public boolean isCoilBacked() {
+        return addr < 0x1000;
+    }
+
+    public boolean isDescreteInputRegisterBacked() {
+        return addr >= 0x1000 && addr < 0x3000;
+    }
+
+    public boolean isInputRegisterBacked() {
+        return addr >= 0x3000 && addr < 0x9000;
+    }
+
+    public boolean isHoldingRegisterBacked() {
+        return addr >= 0x9000;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Map<String,Object> getMetaData() {
+        return new HashMap<String,Object>(){{
+            put("addr",addr);
+            put("unit", unit.abbr);
+            put("name",name);
+            put("description",getDescription());
+            put("registerCount",registerCount);
+            put("denominator", denominator);
+
+        }};
+    }
+
     public ProxyField setChargeController(ChargeController cc) {
         this.chargeController = cc;
         return this;
     }
-
-    abstract public T fromRegisters(int[] registers);
-
-    abstract public int[] toRegisters(T val);
 
     public T getValue() {
         return value;

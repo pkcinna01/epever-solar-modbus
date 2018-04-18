@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ProxyFieldDependentTest extends ChargeControllerDependentTest {
+public class ProxyFieldTest extends ChargeControllerDependentTest {
 
 
     protected void assertFieldValuesEqual(Object expected, Object actual) {
