@@ -37,11 +37,11 @@ public enum EpeverFieldDefinitions {
     REMOTE_BATTERY_TEMPERATURE( 0x311B, (cc, addr) -> new TemperatureField(addr, "Remote battery temperature", "The battery tempeture measured by remote temperature sensor")),
     BATTERY_REAL_RATED_POWER( 0x311D, (cc, addr) -> new PowerField(addr, "Battery's real rated power", "CurrentField system rated votlage. 1200, 2400 represent 12V, 24V").setRegCnt(1)),
 
-    // Real-time status (read-only)
+    // Status
     BATTERY_STATUS( 0x3200, (cc, addr) -> new CodesField(addr, 1, HexCodes.batteryStatus)),
     CHARGING_EQUIPMENT_STATUS(0x3201, (cc, addr) -> new CodesField(addr, 1, HexCodes.chargingEquipmentStatus)),
 
-    // Statistical parameter (read only)
+    // Statistics
     MAXIMUM_INPUT_VOLT_PV_TODAY( 0x3300, (cc, addr) -> new VoltageField(addr, "Maximum input volt (PV) today", "00: 00 Refresh every day")),
     MINIMUM_INPUT_VOLT_PV_TODAY(0x3301 , (cc, addr) -> new VoltageField(addr, "Minimum input volt (PV) today", "00: 00 Refresh every day")),
     MAXIMUM_BATTERY_VOLT_TODAY( 0x3302, (cc, addr) -> new VoltageField(addr, "Maximum battery volt today", "00: 00 Refresh every day")),
@@ -75,9 +75,7 @@ public enum EpeverFieldDefinitions {
     UNDER_VOLTAGE_WARNING( 0x900C, (cc, addr) -> new VoltageField(addr, "Under voltage warning", "Under voltage warning")),
     LOW_VOLTAGE_DISCONNECT( 0x900D, (cc, addr) -> new VoltageField(addr, "Low voltage disconnect", "Low voltage disconnect")),
     DISCHARGING_LIMIT_VOLTAGE( 0x900E, (cc, addr) -> new VoltageField(addr, "Discharging limit voltage", "Discharging limit voltage")),
-    REAL_TIME_CLOCK( 0x9013, (cc, addr) -> new DateTimeField(addr, "Real time clock", "D7-0 Sec, D15-8 Min.(Year,Month,Day,Hour,Min,Sec.should be writed simultaneously)")),
-    //REAL_TIME_CLOCK_2           (0x9014, Amps, "Real time clock 2", "D7-0 Hour, D15-8 Day", 1 ),
-    //REAL_TIME_CLOCK_3           (0x9015, Amps, "Real time clock 3", "D7-0 Month, D15-8 Year", 1 ),
+    REAL_TIME_CLOCK( 0x9013, (cc, addr) -> new DateTimeField(addr, "Real time clock", "Register 0: D7-0 Sec, D15-8 Min, Register 1: D7-0 Hour, D15-8 Day, Register 2: D7-0 Month, D15-8 Year")),
     EQUALIZATION_CHARGING_CYCLE( 0x9016, (cc, addr) -> new FloatField(addr, Int, "Equalization charging cycle", "Interval days of auto equalization charging in cycle Day", 1, 1)),
     BATTERY_TEMPERATURE_WARNING_UPPER_LIMIT( 0x9017, (cc, addr) -> new TemperatureField(addr, "Battery temperature warning upper limit", "Battery temperature warning upper limit")),
     BATTERY_TEMPERATURE_WARNING_LOWER_LIMIT( 0x9018, (cc, addr) -> new TemperatureField(addr, "Battery temperature warning lower limit", "Battery temperature warning lower limit")),
@@ -107,22 +105,21 @@ public enum EpeverFieldDefinitions {
     CHARGING_PERCENTAGE(0x906E, (cc,addr) -> new PercentageField(addr, "Charging percentage", "Depth of charge, 20%-100%.")),
     MANAGEMENT_MODES_OF_BATTERY_CHARGING_AND_DISCHARGING(0x9070, (cc,addr) -> new CurrentField(addr, "Management modes of battery charging and discharging", "Management modes of battery charge and discharge, voltage compensation : 0 and SOC : 1.")),
 
-    // Read Coils (0x01) and Write Single Coil(0x05)
+    // Coils
     LOAD_CONTROL_MODE(0x0002, (cc,addr) -> new BooleanField(addr, "Manual Mode On")),
     LOAD_TEST_MODE(0x0005, (cc,addr) -> new BooleanField(addr, "Load Test Mode On")),
     LOAD_ENABLED(0x0006, (cc,addr) -> new BooleanField(addr, "Force Load On", "Temporarily enable load terminal")),
 
-    // Read Discrete Inputs (0x02)
+    // Discrete Inputs
     DEVICE_TEMPERATURE_THRESHOLD_EXCEEDED(0x2000, (cc,addr) -> new BooleanField(addr,"Internal temperature threshold exceeded")),
     IS_NIGHT(0x200C, (cc,addr) -> new BooleanField(addr, "Is Night", "True: Night, False: Day"));
-
 
 
     private BiFunction<ChargeController,Integer,ModbusField> fieldFactory;
 
     public final int registerAddress;
 
-    private EpeverFieldDefinitions(int registerAddress, BiFunction<ChargeController,Integer,ModbusField> fieldFactory ) {
+    EpeverFieldDefinitions(int registerAddress, BiFunction<ChargeController,Integer,ModbusField> fieldFactory ) {
         this.registerAddress = registerAddress;
         this.fieldFactory = fieldFactory;
     }
