@@ -5,8 +5,8 @@ import org.junit.Before;
 
 public abstract class ChargeControllerDependentTest {
 
-  ChargeController chargeController = new EpeverChargeController();
-  //ChargeController chargeController = new MockChargeController();
+  public ChargeController chargeController = new EpeverChargeController();
+  //public ChargeController chargeController = new MockChargeController();
 
   @Before
   public void setUp() throws Exception {

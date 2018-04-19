@@ -108,28 +108,27 @@ public enum EpeverFieldDefinitions {
     MANAGEMENT_MODES_OF_BATTERY_CHARGING_AND_DISCHARGING(0x9070, (cc,addr) -> new CurrentField(addr, "Management modes of battery charging and discharging", "Management modes of battery charge and discharge, voltage compensation : 0 and SOC : 1.")),
 
     // Read Coils (0x01) and Write Single Coil(0x05)
-    LOAD_CONTROL_MODE(0x0002, (cc,addr) -> new BooleanField(addr, "Manual Mode On", "When the load is manual mode, 1-manual on, 0 -manual off"));
-    //LOAD_TEST_MODE(0x0005, Bool, "Enable load test mode", "1 Enable, 0 Disable(normal)"),
-    //LOAD_ENABLED(0x0006, Bool, "Force the load on/off", "1 Turn on, 0 Turn off (used for temporary test of the load)"),
+    LOAD_CONTROL_MODE(0x0002, (cc,addr) -> new BooleanField(addr, "Manual Mode On")),
+    LOAD_TEST_MODE(0x0005, (cc,addr) -> new BooleanField(addr, "Load Test Mode On")),
+    LOAD_ENABLED(0x0006, (cc,addr) -> new BooleanField(addr, "Force Load On", "Temporarily enable load terminal")),
 
     // Read Discrete Inputs (0x02)
-    //DEVICE_TEMPERATURE_THRESHOLD_EXCEEDED(0x2000, Bool, "Over temperature inside the device",
-     //       "1 The temperature inside the controller is higher than the over-temperature protection point. 0 Normal"),
-    //IS_NIGHT(0x200C, Bool, "Day/Night", "1-Night, 0-Day");
+    DEVICE_TEMPERATURE_THRESHOLD_EXCEEDED(0x2000, (cc,addr) -> new BooleanField(addr,"Internal temperature threshold exceeded")),
+    IS_NIGHT(0x200C, (cc,addr) -> new BooleanField(addr, "Is Night", "True: Night, False: Day"));
 
 
 
-    private BiFunction<ChargeController,Integer,ProxyField> fieldFactory;
+    private BiFunction<ChargeController,Integer,ModbusField> fieldFactory;
 
     public final int registerAddress;
 
-    private EpeverFieldDefinitions(int registerAddress, BiFunction<ChargeController,Integer,ProxyField> fieldFactory ) {
+    private EpeverFieldDefinitions(int registerAddress, BiFunction<ChargeController,Integer,ModbusField> fieldFactory ) {
         this.registerAddress = registerAddress;
         this.fieldFactory = fieldFactory;
     }
 
-    public ProxyField create(ChargeController cc) {
-        ProxyField field = fieldFactory.apply(cc,registerAddress);
+    public ModbusField create(ChargeController cc) {
+        ModbusField field = fieldFactory.apply(cc,registerAddress);
         field.setChargeController(cc);
         return field;
     }

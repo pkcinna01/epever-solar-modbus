@@ -9,7 +9,7 @@ D7-0 Sec, D15-8 Min
 D7-0 Hour, D15-8 Day
 D7-0 Month, D15-8 Year
 */
-public class DateTimeField extends ProxyField<LocalDateTime> {
+public class DateTimeField extends RegisterBackedField<LocalDateTime> {
 
 
     public DateTimeField(int addr, String name, String description) {

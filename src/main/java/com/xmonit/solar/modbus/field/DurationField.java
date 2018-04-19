@@ -10,7 +10,7 @@ D7-0 Sec, D15-8 Min
 D7-0 Hour, D15-8 Day
 D7-0 Month, D15-8 Year
 */
-public class DurationField extends ProxyField<LocalTime> {
+public class DurationField extends RegisterBackedField<LocalTime> {
 
 
     public DurationField(int addr, String name, String description) {

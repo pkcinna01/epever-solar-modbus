@@ -38,7 +38,22 @@ public class MockChargeController extends ChargeController {
     }
 
     @Override
+    public boolean[] readDiscreteInputs(int addr, int inputCount) throws ChargeControllerException {
+        return new boolean[0];
+    }
+
+    @Override
+    public boolean[] readCoils(int addr, int coilCount) throws ChargeControllerException {
+        return new boolean[0];
+    }
+
+    @Override
     public void writeRegisters(int addr, int[] registers) throws ChargeControllerException {
+
+    }
+
+    @Override
+    public void writeCoils(int addr, boolean[] coils) throws ChargeControllerException {
 
     }
 }

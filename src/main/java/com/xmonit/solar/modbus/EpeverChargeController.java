@@ -91,7 +91,7 @@ public class EpeverChargeController extends ChargeController {
         try {
             return modbusMaster.readInputRegisters(id, addr, registerCount);
         } catch (Exception ex) {
-            throw new ChargeControllerException("Failed input registers.  Address="+addr,ex);
+            throw new ChargeControllerException("Failed reading input register(s).  Address="+addr,ex);
         }
     }
 
@@ -100,19 +100,44 @@ public class EpeverChargeController extends ChargeController {
         try {
             return modbusMaster.readHoldingRegisters(id, addr, registerCount);
         } catch (Exception ex) {
-            throw new ChargeControllerException("Failed input registers.  Address="+addr,ex);
+            throw new ChargeControllerException("Failed reading holding register(s).  Address="+addr,ex);
         }
     }
 
+    @Override
+    public boolean[] readDiscreteInputs(int addr, int inputCount) throws ChargeControllerException {
+        try {
+            return modbusMaster.readDiscreteInputs(id, addr, inputCount);
+        } catch (Exception ex) {
+            throw new ChargeControllerException("Failed reading discrete input(s).  Address="+addr,ex);
+        }
+    }
+
+    @Override
+    public boolean[] readCoils(int addr, int coilCount) throws ChargeControllerException {
+        try {
+            return modbusMaster.readCoils(id, addr, coilCount);
+        } catch (Exception ex) {
+            throw new ChargeControllerException("Failed reading coil(s).  Address="+addr,ex);
+        }
+    }
 
     @Override
     public void writeRegisters(int addr, int[] registers) throws ChargeControllerException {
         try {
             modbusMaster.writeMultipleRegisters(id, addr, registers);
         } catch (Exception ex) {
-            throw new ChargeControllerException("Failed input registers.  Address="+addr,ex);
+            throw new ChargeControllerException("Failed writing holding registers.  Address="+addr,ex);
         }
     }
 
+    @Override
+    public void writeCoils(int addr, boolean[] coils) throws ChargeControllerException {
+        try {
+            modbusMaster.writeMultipleCoils(id, addr, coils);
+        } catch (Exception ex) {
+            throw new ChargeControllerException("Failed writing coils.  Address="+addr,ex);
+        }
+    }
 
 }

@@ -5,7 +5,7 @@ import com.xmonit.solar.modbus.units.Unit;
 
 import java.math.BigDecimal;
 
-public class DecimalField extends ProxyField<BigDecimal> {
+public class DecimalField extends RegisterBackedField<BigDecimal> {
 
 
     public DecimalField(int addr, Unit unit, String name, String description, int multiplier, int registerCount) {

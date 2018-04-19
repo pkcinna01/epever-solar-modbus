@@ -4,6 +4,17 @@ import java.time.LocalTime;
 
 public class Unit {
 
+    static class EmptyUnit extends Unit {
+        EmptyUnit(String name, String abbr) {
+            super(name,abbr);
+        }
+
+        @Override
+        public String asString(Object val) {
+            return val != null ? val.toString() : null;
+        }
+    }
+
     public static final Unit
             Volts = new Unit("VoltageField","V"),
             Amps = new Unit("Ampere", "A"),
@@ -15,16 +26,9 @@ public class Unit {
             KWH = new Unit("KWH, Kilowatt/Hour", "KWH"),
             Ton = new Unit("1000kg", "t"),
             mOHM = new Unit("milliohm", "mOHM"),
-            Int = new Unit("integer", "") {
-                @Override
-                public String asString(Object val) {
-                    return val != null ? val.toString() : null;
-                }
-            },
-            //Bool = new Unit("boolean", ""),
-            //Seconds = new Unit("seconds", "s"),
+            Int = new EmptyUnit("integer", ""),
+            Bool = new EmptyUnit("boolean", "true or false"),
             Minutes = new Unit("minutes", "min"),
-            //Hours = new Unit("hours", "h"),
             Time = new Time.SecondsMinutesHours("time"),
             DateTime = new Time.SecondsMinutesHoursDayMonthYear("date/time"),
             Duration = new Unit("duration (hh:mm)", "hh:mm") {

@@ -5,7 +5,7 @@ import com.xmonit.solar.modbus.units.Unit;
 
 import java.math.BigInteger;
 
-public class IntegerField extends ProxyField<BigInteger> {
+public class IntegerField extends RegisterBackedField<BigInteger> {
 
 
     public IntegerField(int addr, Unit unit, String name, String description, int multiplier, int registerCount) {

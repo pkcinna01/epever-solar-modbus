@@ -3,7 +3,6 @@ package com.xmonit.solar.modbus.field;
 import com.xmonit.solar.modbus.RegisterConversions;
 import com.xmonit.solar.modbus.units.Unit;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /*
@@ -11,7 +10,7 @@ D7-0 Sec, D15-8 Min
 D7-0 Hour, D15-8 Day
 D7-0 Month, D15-8 Year
 */
-public class TimeField extends ProxyField<LocalTime> {
+public class TimeField extends RegisterBackedField<LocalTime> {
 
 
     public TimeField(int addr, String name, String description) {

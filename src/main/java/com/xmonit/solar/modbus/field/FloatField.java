@@ -5,7 +5,7 @@ import com.xmonit.solar.modbus.units.Unit;
 
 import java.math.BigDecimal;
 
-public class FloatField extends ProxyField<java.lang.Float> {
+public class FloatField extends RegisterBackedField<Float> {
 
 
     public FloatField(int addr, Unit unit, String name, String description, int multiplier, int registerCount) {

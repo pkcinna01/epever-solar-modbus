@@ -42,5 +42,12 @@ abstract public class ChargeController {
 
     abstract public int[] readHoldingRegisters(int addr, int registerCount) throws ChargeControllerException;
 
+    abstract public boolean[] readDiscreteInputs(int addr, int inputCount) throws ChargeControllerException;
+
+    abstract public boolean[] readCoils(int addr, int coilCount) throws ChargeControllerException;
+
     abstract public void writeRegisters(int addr, int[] registers) throws ChargeControllerException;
+
+    abstract public void writeCoils(int addr, boolean[] coils) throws ChargeControllerException;
+
 }
