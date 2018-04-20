@@ -27,9 +27,14 @@ public abstract class RegisterBackedField<T> extends ModbusField<T> {
         this(addr, unit, name, description, denominator, 1);
     }
 
-    abstract public T fromRegisters(int[] registers);
+    abstract public T fromRegisters(int offset, int[] registers);
 
     abstract public int[] toRegisters(T val);
+
+    @Override
+    public int getCount() {
+        return registerCount;
+    }
 
     @Override
     public Map<String,Object> getMetaData() {
@@ -42,7 +47,11 @@ public abstract class RegisterBackedField<T> extends ModbusField<T> {
     @Override
     public T readValue() throws ChargeControllerException {
         int registers[] = readRegisters();
-        value = fromRegisters(registers);
+        return readValue(0, registers);
+    }
+
+    public T readValue(int offset, int[] registers) {
+        value = fromRegisters(offset, registers);
         commitTime = LocalDateTime.now();
         return value;
     }
@@ -54,7 +63,7 @@ public abstract class RegisterBackedField<T> extends ModbusField<T> {
         this.commitTime = LocalDateTime.now();
     }
 
-    public RegisterBackedField<T> setRegCnt(int cnt) {
+    public RegisterBackedField<T> setCount(int cnt) {
         this.registerCount = cnt;
         return this;
     }

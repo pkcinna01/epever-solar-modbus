@@ -13,8 +13,8 @@ public class DecimalField extends RegisterBackedField<BigDecimal> {
     }
 
     @Override
-    public BigDecimal fromRegisters(int[] registers) {
-        return RegisterConversions.toBigDecimal(registers, denominator);
+    public BigDecimal fromRegisters(int offset, int[] registers) {
+        return RegisterConversions.toBigDecimal(offset, registerCount, registers, denominator);
     }
 
     @Override

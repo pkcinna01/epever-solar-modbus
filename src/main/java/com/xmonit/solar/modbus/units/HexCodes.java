@@ -23,7 +23,7 @@ public class HexCodes extends Unit {
         }
     }
 
-    List<BitRangeContext> bitRangeContexts = new LinkedList();
+    List<BitRangeContext> bitRangeContextList = new LinkedList();
 
     public static HexCodes batteryStatus = new HexCodes("Battery Status")
             .bitRange(0,3, "VoltageField").add(0x00,"Normal").add(0x01,"Over Volt").add(0x02,"Under Volt").add(0x03,"Low Volt Disconnect").add(0x04,"Fault")
@@ -69,28 +69,45 @@ public class HexCodes extends Unit {
 
     public HexCodes(String name) {
         super(name, name);
-        //bitRangeContexts.add( new BitRangeContext() );
+        //bitRangeContextList.add( new BitRangeContext() );
     }
 
-    HexCodes bitRange(int start, int end) {
+    public HexCodes bitRange(int start, int end) {
         return bitRange(start,end,"");
     }
 
-    HexCodes bitRange(int start, int end, String desc) {
+    public HexCodes bitRange(int start, int end, String desc) {
         BitRangeContext brc = new BitRangeContext();
         brc.name = desc;
         brc.start = start;
         brc.end = end;
-        bitRangeContexts.add(brc);
+        bitRangeContextList.add(brc);
         return this;
     }
 
-    HexCodes add(int value, String desc) {
-        if ( bitRangeContexts.isEmpty() ) {
-            bitRangeContexts.add( new BitRangeContext() );
+    public HexCodes add(int value, String desc) {
+        if ( bitRangeContextList.isEmpty() ) {
+            bitRangeContextList.add( new BitRangeContext() );
         }
-        bitRangeContexts.get(bitRangeContexts.size() -1).flags.add( Pair.of(value,desc) );
+        bitRangeContextList.get(bitRangeContextList.size() -1).flags.add( Pair.of(value,desc) );
         return this;
+    }
+
+    public int findByName(String codeName ) throws Exception {
+        if ( bitRangeContextList.size() > 1 ) {
+            throw new Exception(this.name + " has multiple bit ranges defined.  The bit range name must also be specified (use findByBitRangeAndName)");
+        }
+        BitRangeContext brc = bitRangeContextList.get(0);
+        for( Pair<Integer,String> pair : brc.flags) {
+            if ( pair.getValue().equalsIgnoreCase(codeName) ) {
+                return pair.getKey();
+            }
+        }
+        throw new Exception("'"+codeName+"' not a valid choice.  " + getDescription());
+    }
+
+    public int findByBitRangeAndName(String bitRangeName, String codeName) throws Exception {
+        throw new Exception("Not implemented... need to test setting multiple bit ranges within a register");
     }
 
     public String asString(Integer val ) {
@@ -102,11 +119,11 @@ public class HexCodes extends Unit {
 
         BigInteger bigEndianInt = (BigInteger) val;
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < bitRangeContexts.size(); i++ ) {
+        for(int i = 0; i < bitRangeContextList.size(); i++ ) {
             if ( i != 0 ) {
                 sb.append(", ");
             }
-            BitRangeContext brc = bitRangeContexts.get(i);
+            BitRangeContext brc = bitRangeContextList.get(i);
             BigInteger mask = BigInteger.ONE.shiftLeft(brc.end).subtract(BigInteger.ONE);
             BigInteger codeValue = bigEndianInt.shiftRight(brc.start).and( mask );
             if( !StringUtils.isEmpty(brc.name)) {
@@ -123,14 +140,14 @@ public class HexCodes extends Unit {
 
         if (!StringUtils.isEmpty(name)) {
             sb.append(name);
-            if ( bitRangeContexts.size() != 1 ) {
+            if ( bitRangeContextList.size() != 1 ) {
                 sb.append(" -");
             }
             sb.append(" ");
         }
 
-        for ( int i = 0; i < bitRangeContexts.size(); i++ ) {
-            BitRangeContext bitRange = bitRangeContexts.get(i);
+        for (int i = 0; i < bitRangeContextList.size(); i++ ) {
+            BitRangeContext bitRange = bitRangeContextList.get(i);
             if ( !bitRange.flags.isEmpty() ) {
                 if ( i != 0 ) {
                     sb.append(", ");

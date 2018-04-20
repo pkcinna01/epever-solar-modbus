@@ -67,34 +67,38 @@ public class RegisterConversions {
     }
 
 
-    public static byte[] toBytes(int[] registers) {
-        byte[] bytes = new byte[registers.length*2];
-        for( int i = 0; i < registers.length; i++ ) {
-            bytes[2*i] = (byte)(registers[i] & 0xFF);
-            bytes[2*i+1] = (byte)(registers[i] >> 8);
+    public static byte[] toBytes(int offset, int count, int[] registers) {
+        if ( registers.length < offset+count) {
+            throw new IndexOutOfBoundsException(String.format("Offset (%d) + register count (%d) exceeds the registers array length (%d). ",offset,count,registers.length));
+        }
+        byte[] bytes = new byte[count*2];
+        //System.out.println("toBytes bytes.length=" + bytes.length + " registers.length=" + registers.length + " offset=" + offset);
+        for( int i = offset; i < offset+count; i++ ) {
+            bytes[2*(i-offset)] = (byte)(registers[i] & 0xFF);
+            bytes[2*(i-offset)+1] = (byte)(registers[i] >> 8);
         }
         return bytes;
     }
 
-    public static BigDecimal toBigDecimal(int[] registers, int denominator) {
-        byte[] bytes = toBytes(registers);
+    public static BigDecimal toBigDecimal(int offset, int count, int[] registers, int denominator) {
+        byte[] bytes = toBytes(offset,count,registers);
         ArrayUtils.reverse(bytes);
         BigInteger bigInt = new BigInteger(bytes);
         return new BigDecimal(bigInt).divide(new BigDecimal(denominator));
     }
 
-    public static BigInteger toBigInteger(int[] registers, int denominator) {
-        byte[] bytes = toBytes(registers);
+    public static BigInteger toBigInteger(int offset, int count, int[] registers, int denominator) {
+        byte[] bytes = toBytes(offset,count,registers);
         ArrayUtils.reverse(bytes);
         return new BigInteger(bytes).divide( BigInteger.valueOf(denominator));
     }
 
-    public static double toDouble(int[] registers, int denominator) {
-        return toBigDecimal(registers, denominator).doubleValue();
+    public static double toDouble(int offset, int count, int[] registers, int denominator) {
+        return toBigDecimal(offset, count, registers, denominator).doubleValue();
     }
 
-    public static LocalDateTime toDateTime(int[] registers) {
-        byte[] bytes = RegisterConversions.toBytes(registers);
+    public static LocalDateTime toDateTime(int offset, int count, int[] registers) {
+        byte[] bytes = RegisterConversions.toBytes(offset, count, registers);
 
         byte hours = bytes[2], minutes = bytes[1], seconds = bytes[0];
         LocalTime time = LocalTime.of(hours,minutes,seconds);
@@ -105,19 +109,19 @@ public class RegisterConversions {
         return LocalDateTime.of(date,time);
     }
 
-    public static LocalTime toTime(int[] registers) {
+    public static LocalTime toTime(int offset, int count, int[] registers) {
 
         LocalTime time = null;
 
-        if ( registers.length == 1 ) {
+        if ( count == 1 ) {
             // just have hours and minutes from single register
-            byte[] bytes = RegisterConversions.toBytes(registers);
+            byte[] bytes = RegisterConversions.toBytes(offset, count, registers);
             time = LocalTime.of(bytes[1],bytes[0],0);
-        } else if ( registers.length == 3 ) {
+        } else if ( count == 3 ) {
             int hours = registers[2], minutes = registers[1], seconds = registers[0];
             time = LocalTime.of(hours,minutes,seconds);
         } else {
-            throw new RuntimeException("Unsupported register count during registers to LocalTime conversion");
+            throw new RuntimeException("Unsupported register count during registers to LocalTime conversion. Count=" + count);
         }
 
         return time;

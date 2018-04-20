@@ -31,6 +31,8 @@ abstract public class ModbusField<T> {
 
     abstract public void writeValue(T val) throws ChargeControllerException;
 
+    abstract int getCount();
+
     public Map<String,Object> getMetaData() {
         return new HashMap<String,Object>(){{
             put("addr",addr);
@@ -48,6 +50,8 @@ abstract public class ModbusField<T> {
         return addr >= 0x1000 && addr < 0x3000;
     }
 
+    public boolean isBitBacked() { return isCoilBacked() || isDiscreteInputBacked(); }
+
     public boolean isInputRegisterBacked() {
         return addr >= 0x3000 && addr < 0x9000;
     }
@@ -55,6 +59,8 @@ abstract public class ModbusField<T> {
     public boolean isHoldingRegisterBacked() {
         return addr >= 0x9000;
     }
+
+    public boolean isRegisterBacked() { return isInputRegisterBacked() || isHoldingRegisterBacked(); }
 
     public T getValue() {
         return value;

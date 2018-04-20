@@ -1,20 +1,15 @@
 package com.xmonit.solar.modbus.field;
 
-import com.intelligt.modbus.jlibmodbus.exception.ModbusIOException;
-import com.intelligt.modbus.jlibmodbus.exception.ModbusNumberException;
-import com.intelligt.modbus.jlibmodbus.exception.ModbusProtocolException;
-import com.intelligt.modbus.jlibmodbus.serial.SerialPortException;
 import com.xmonit.solar.modbus.ChargeControllerDependentTest;
 import com.xmonit.solar.modbus.ChargeControllerException;
 import com.xmonit.solar.modbus.EpeverFieldDefinitions;
 import com.xmonit.solar.modbus.RegisterConversions;
-import com.xmonit.solar.modbus.field.DateTimeField;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class DateTimeFieldTest extends ChargeControllerDependentTest {
 
@@ -24,9 +19,10 @@ public class DateTimeFieldTest extends ChargeControllerDependentTest {
         LocalDateTime localDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         System.out.println(localDateTime);
         int[] registers = RegisterConversions.fromDateTime(localDateTime);
-        LocalDateTime localDateTime2 = RegisterConversions.toDateTime(registers);
+        LocalDateTime localDateTime2 = RegisterConversions.toDateTime(0,dateTimeField.registerCount,registers);
         System.out.println(localDateTime2);
-        assertEquals(dateTimeField,localDateTime2);
+
+        assertEquals(localDateTime,localDateTime2);
 
         System.out.println(dateTimeField.name);
         LocalDateTime localDateTime3 = dateTimeField.readValue();

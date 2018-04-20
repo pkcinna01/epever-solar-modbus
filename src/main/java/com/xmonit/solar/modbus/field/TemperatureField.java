@@ -22,8 +22,8 @@ public class TemperatureField extends FloatField {
     //
 
     @Override
-    public java.lang.Float fromRegisters(int[] registers) {
-        java.lang.Float celciusVal = super.fromRegisters(registers);
+    public java.lang.Float fromRegisters(int offset, int[] registers) {
+        java.lang.Float celciusVal = super.fromRegisters(offset, registers);
         if (unit != Unit.Fahrenheit) {
             return celciusVal;
         } else {

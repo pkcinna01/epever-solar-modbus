@@ -21,6 +21,10 @@ import static com.intelligt.modbus.jlibmodbus.Modbus.MIN_SERVER_ADDRESS;
 
 abstract public class ChargeController {
 
+    public static String hex(int i) {
+        return String.format("0x%04X",i);
+    }
+
     static Integer idCounter = MIN_SERVER_ADDRESS; // increment each time a charge controller is created
     int id;
 

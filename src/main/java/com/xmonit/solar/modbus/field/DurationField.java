@@ -19,9 +19,9 @@ public class DurationField extends RegisterBackedField<LocalTime> {
 
 
     @Override
-    public LocalTime fromRegisters(int[] registers) {
+    public LocalTime fromRegisters(int offset, int[] registers) {
 
-        return RegisterConversions.toTime(registers);
+        return RegisterConversions.toTime(offset, registerCount, registers);
     }
 
     @Override

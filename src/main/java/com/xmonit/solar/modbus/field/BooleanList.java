@@ -20,9 +20,14 @@ public class BooleanList extends ModbusField<List<Boolean>> {
         super(addr, Unit.Bool, name, description);
     }
 
-    public BooleanList setBitCount(int cnt) {
+    public BooleanList setCount(int cnt) {
         this.bitCount = cnt;
         return this;
+    }
+
+    @Override
+    public int getCount() {
+        return bitCount;
     }
 
     @Override
@@ -38,6 +43,12 @@ public class BooleanList extends ModbusField<List<Boolean>> {
 
         this.commitTime = LocalDateTime.now();
         this.value = IntStream.range(0,rtnVals.length).mapToObj(i->rtnVals[i]).collect(Collectors.toList());
+        return this.value;
+    }
+
+    public List<Boolean> readValue(int offset, boolean[] values) throws ChargeControllerException {
+        this.value = IntStream.range(0,bitCount).mapToObj(i->values[offset+i]).collect(Collectors.toList());
+        this.commitTime = LocalDateTime.now();
         return this.value;
     }
 

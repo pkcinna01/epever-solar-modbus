@@ -7,6 +7,7 @@ import com.intelligt.modbus.jlibmodbus.master.ModbusMasterFactory;
 import com.intelligt.modbus.jlibmodbus.msg.base.mei.MEIReadDeviceIdentification;
 import com.intelligt.modbus.jlibmodbus.msg.base.mei.ReadDeviceIdentificationCode;
 import com.intelligt.modbus.jlibmodbus.serial.*;
+import com.xmonit.solar.modbus.field.ModbusField;
 import purejavacomm.CommPortIdentifier;
 
 import java.nio.charset.Charset;
@@ -91,7 +92,7 @@ public class EpeverChargeController extends ChargeController {
         try {
             return modbusMaster.readInputRegisters(id, addr, registerCount);
         } catch (Exception ex) {
-            throw new ChargeControllerException("Failed reading input register(s).  Address="+addr,ex);
+            throw new ChargeControllerException("Failed reading input register(s).  Address="+ hex(addr) + " Count="+registerCount,ex);
         }
     }
 
@@ -100,7 +101,7 @@ public class EpeverChargeController extends ChargeController {
         try {
             return modbusMaster.readHoldingRegisters(id, addr, registerCount);
         } catch (Exception ex) {
-            throw new ChargeControllerException("Failed reading holding register(s).  Address="+addr,ex);
+            throw new ChargeControllerException("Failed reading holding register(s).  Address="+hex(addr)+ " Count="+registerCount,ex);
         }
     }
 
@@ -109,7 +110,7 @@ public class EpeverChargeController extends ChargeController {
         try {
             return modbusMaster.readDiscreteInputs(id, addr, inputCount);
         } catch (Exception ex) {
-            throw new ChargeControllerException("Failed reading discrete input(s).  Address="+addr,ex);
+            throw new ChargeControllerException("Failed reading discrete input(s).  Address="+hex(addr)+ " Count="+inputCount,ex);
         }
     }
 
@@ -118,7 +119,7 @@ public class EpeverChargeController extends ChargeController {
         try {
             return modbusMaster.readCoils(id, addr, coilCount);
         } catch (Exception ex) {
-            throw new ChargeControllerException("Failed reading coil(s).  Address="+addr,ex);
+            throw new ChargeControllerException("Failed reading coil(s).  Address="+hex(addr)+ " Count="+coilCount,ex);
         }
     }
 
@@ -127,7 +128,7 @@ public class EpeverChargeController extends ChargeController {
         try {
             modbusMaster.writeMultipleRegisters(id, addr, registers);
         } catch (Exception ex) {
-            throw new ChargeControllerException("Failed writing holding registers.  Address="+addr,ex);
+            throw new ChargeControllerException("Failed writing holding registers.  Address="+hex(addr)+ " Count="+registers.length,ex);
         }
     }
 
@@ -136,7 +137,7 @@ public class EpeverChargeController extends ChargeController {
         try {
             modbusMaster.writeMultipleCoils(id, addr, coils);
         } catch (Exception ex) {
-            throw new ChargeControllerException("Failed writing coils.  Address="+addr,ex);
+            throw new ChargeControllerException("Failed writing coils.  Address="+hex(addr),ex);
         }
     }
 

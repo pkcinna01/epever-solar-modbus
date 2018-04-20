@@ -13,8 +13,8 @@ public class FloatField extends RegisterBackedField<Float> {
     }
 
     @Override
-    public Float fromRegisters(int[] registers) {
-        return RegisterConversions.toBigDecimal(registers, denominator).floatValue();
+    public Float fromRegisters(int offset, int[] registers) {
+        return RegisterConversions.toBigDecimal(offset, registerCount, registers, denominator).floatValue();
     }
 
     @Override

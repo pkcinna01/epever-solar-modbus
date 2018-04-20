@@ -13,8 +13,8 @@ public class IntegerField extends RegisterBackedField<BigInteger> {
     }
 
     @Override
-    public BigInteger fromRegisters(int[] registers) {
-        return RegisterConversions.toBigInteger(registers, denominator);
+    public BigInteger fromRegisters(int offset, int[] registers) {
+        return RegisterConversions.toBigInteger(offset, registerCount, registers, denominator);
     }
 
     @Override

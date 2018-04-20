@@ -14,15 +14,21 @@ public class CodesField extends RegisterBackedField<BigInteger> {
     }
 
     @Override
-    public BigInteger fromRegisters(int[] registers) {
+    public BigInteger fromRegisters(int offset, int[] registers) {
 
-        return RegisterConversions.toBigInteger(registers, denominator);
+        return RegisterConversions.toBigInteger(offset, registerCount, registers, denominator);
     }
 
     @Override
     public int[] toRegisters(BigInteger val) {
 
         return RegisterConversions.fromBigInteger(val,denominator);
+    }
+
+    public void writeValue(String codeName) throws Exception {
+        HexCodes codes = (HexCodes) unit;
+        int code = codes.findByName(codeName);
+        writeValue(BigInteger.valueOf(code));
     }
 
 }

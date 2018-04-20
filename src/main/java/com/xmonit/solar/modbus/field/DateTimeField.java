@@ -18,8 +18,8 @@ public class DateTimeField extends RegisterBackedField<LocalDateTime> {
 
 
     @Override
-    public LocalDateTime fromRegisters(int[] registers) {
-        return RegisterConversions.toDateTime(registers);
+    public LocalDateTime fromRegisters(int offset, int[] registers) {
+        return RegisterConversions.toDateTime(offset, registerCount, registers);
     }
 
     @Override

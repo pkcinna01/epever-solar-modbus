@@ -13,10 +13,10 @@ public enum EpeverFieldDefinitions {
 
     CE_RATED_INPUT_VOLTAGE( 0x3000, (cc, addr) -> new VoltageField(addr, "Charging Equipment Rated Input VoltageField", "PV array rated voltage")),
     CE_RATED_INPUT_CURRENT( 0x3001, (cc, addr) -> new CurrentField(addr, "Charging Equipment Rated Input CurrentField", "PV array rated current")),
-    CE_RATED_INPUT_POWER( 0x3002, (cc, addr) -> new PowerField(addr, "Charging equipment rated input power", "PV array rated power")),
+    CE_RATED_INPUT_POWER( 0x3002, (cc, addr) -> new PowerField(addr, "Charging equipment rated input power", "PV array rated power").setCount(2)),
     CE_RATED_OUTPUT_VOLTAGE( 0x3004, (cc, addr) -> new VoltageField(addr, "Charging equipment rated output voltage", "Battery voltage") ),
     CE_RATED_OUTPUT_CURRENT( 0x3005, (cc, addr) -> new CurrentField(addr, "Charging equipment rated output current", "Rated charging current to battery")),
-    CE_RATED_OUTPUT_POWER( 0x3006, (cc, addr) -> new PowerField(addr, "Charging equipment rated output power", "Rated charging power to battery")),
+    CE_RATED_OUTPUT_POWER( 0x3006, (cc, addr) -> new PowerField(addr, "Charging equipment rated output power", "Rated charging power to battery").setCount(2)),
     CHARGING_MODE( 0x3008, (cc, addr) -> new CodesField(addr, 1, HexCodes.chargingMode)),
     LOAD_RATED_OUTPUT_CURRENT( 0x300E, (cc, addr) -> new CurrentField(addr, "Rated output current of load", "")),
 
@@ -29,13 +29,13 @@ public enum EpeverFieldDefinitions {
 
     LOAD_OUTPUT_VOLTAGE( 0x310C, (cc, addr) -> new VoltageField(addr, "Discharging equipment output voltage", "Load voltage")),
     LOAD_OUTPUT_CURRENT( 0x310D, (cc, addr) -> new CurrentField(addr, "Discharging equipment output current", "Load current")),
-    LOAD_OUTPUT_POWER( 0x310E, (cc, addr) -> new PowerField(addr, "Discharging equipment output power", "Load power")),
+    LOAD_OUTPUT_POWER( 0x310E, (cc, addr) -> new PowerField(addr, "Discharging equipment output power", "Load power").setCount(1)),
     BATTERY_TEMPERATURE( 0x3110, (cc, addr) -> new TemperatureField(addr, "Battery TemperatureField", "Battery TemperatureField")),
     CE_TEMPERATURE( 0x3111, (cc, addr) -> new TemperatureField(addr, "TemperatureField inside equipment", "TemperatureField inside case")),
     CE_SURFACE_TEMPERATURE( 0x3112, (cc, addr) -> new TemperatureField(addr, "PowerField components temperature", "Heat sink surface temperature of equipments' power components")),
     BATTERY_SOC( 0x311A, (cc, addr) -> new PercentageField(addr, "Battery SOC", "The percentage of battery's remaining capacity")),
     REMOTE_BATTERY_TEMPERATURE( 0x311B, (cc, addr) -> new TemperatureField(addr, "Remote battery temperature", "The battery tempeture measured by remote temperature sensor")),
-    BATTERY_REAL_RATED_POWER( 0x311D, (cc, addr) -> new PowerField(addr, "Battery's real rated power", "CurrentField system rated votlage. 1200, 2400 represent 12V, 24V").setRegCnt(1)),
+    BATTERY_REAL_RATED_POWER( 0x311D, (cc, addr) -> new PowerField(addr, "Battery's real rated power", "CurrentField system rated votlage. 1200, 2400 represent 12V, 24V")),
 
     // Status
     BATTERY_STATUS( 0x3200, (cc, addr) -> new CodesField(addr, 1, HexCodes.batteryStatus)),
@@ -46,16 +46,16 @@ public enum EpeverFieldDefinitions {
     MINIMUM_INPUT_VOLT_PV_TODAY(0x3301 , (cc, addr) -> new VoltageField(addr, "Minimum input volt (PV) today", "00: 00 Refresh every day")),
     MAXIMUM_BATTERY_VOLT_TODAY( 0x3302, (cc, addr) -> new VoltageField(addr, "Maximum battery volt today", "00: 00 Refresh every day")),
     MINIMUM_BATTERY_VOLT_TODAY( 0x3303, (cc, addr) -> new VoltageField(addr, "Minimum battery volt today", "00: 00 Refresh every day")),
-    CONSUMED_ENERGY_TODAY( 0x3304, (cc, addr) -> new FloatField(addr, KWH, "Consumed energy today", "00: 00 Clear every day", 100, 2)),
-    CONSUMED_ENERGY_THIS_MONTH( 0x3306, (cc, addr) -> new FloatField(addr, KWH, "Consumed energy this month", "00: 00 Clear on the first day of month", 100, 2)),
-    CONSUMED_ENERGY_THIS_YEAR( 0x3308, (cc, addr) -> new FloatField(addr, KWH, "Consumed energy this year", "00: 00 Clear on 1, Jan.", 100, 2)),
-    TOTAL_CONSUMED_ENERGY( 0x330A, (cc, addr) -> new FloatField(addr, KWH, "Total consumed energy", "Total consumed energy", 100, 2)),
-    GENERATED_ENERGY_TODAY(0x330C , (cc, addr) -> new FloatField(addr, KWH, "Generated energy today", "00: 00 Clear every day.", 100, 2)),
-    GENERATED_ENERGY_THIS_MONTH( 0x330E, (cc, addr) -> new FloatField(addr, KWH, "Generated energy this month", "00: 00 Clear on the first day of month.", 100, 2)),
-    GENERATED_ENERGY_THIS_YEAR( 0x3310, (cc, addr) -> new FloatField(addr, KWH, "Generated energy this year", "00: 00 Clear on 1, Jan.", 100, 2)),
-    TOTAL_GENERATED_ENERGY( 0x3312, (cc, addr) -> new FloatField(addr, KWH, "Total generated energy", "Total generated energy", 100, 2)),
-    CARBON_DIOXIDE_REDUCTION( 0x3314, (cc, addr) -> new FloatField(addr, Ton, "Carbon dioxide reduction", "Saving 1 Kilowatt=Reduction 0.997KG''Carbon dioxide ''=Reduction 0.272KG''Carton''", 100, 2)),
-    BATTERY_CURRENT( 0x331B, (cc, addr) -> new CurrentField(addr, "Battery CurrentField", "Net battery current (charging minus discharging).", 100, 2)),
+    CONSUMED_ENERGY_TODAY( 0x3304, (cc, addr) -> new FloatField(addr, KWH, "Consumed energy today", "00: 00 Clear every day", 100, 1)),
+    CONSUMED_ENERGY_THIS_MONTH( 0x3306, (cc, addr) -> new FloatField(addr, KWH, "Consumed energy this month", "00: 00 Clear on the first day of month", 100, 1)),
+    CONSUMED_ENERGY_THIS_YEAR( 0x3308, (cc, addr) -> new FloatField(addr, KWH, "Consumed energy this year", "00: 00 Clear on 1, Jan.", 100, 1)),
+    TOTAL_CONSUMED_ENERGY( 0x330A, (cc, addr) -> new FloatField(addr, KWH, "Total consumed energy", "Total consumed energy", 100, 1)),
+    GENERATED_ENERGY_TODAY(0x330C , (cc, addr) -> new FloatField(addr, KWH, "Generated energy today", "00: 00 Clear every day.", 100, 1)),
+    GENERATED_ENERGY_THIS_MONTH( 0x330E, (cc, addr) -> new FloatField(addr, KWH, "Generated energy this month", "00: 00 Clear on the first day of month.", 100, 1)),
+    GENERATED_ENERGY_THIS_YEAR( 0x3310, (cc, addr) -> new FloatField(addr, KWH, "Generated energy this year", "00: 00 Clear on 1, Jan.", 100, 1)),
+    TOTAL_GENERATED_ENERGY( 0x3312, (cc, addr) -> new FloatField(addr, KWH, "Total generated energy", "Total generated energy", 100, 1)),
+    CARBON_DIOXIDE_REDUCTION( 0x3314, (cc, addr) -> new FloatField(addr, Ton, "Carbon dioxide reduction", "Saving 1 Kilowatt=Reduction 0.997KG''Carbon dioxide ''=Reduction 0.272KG''Carton''", 100, 1)),
+    BATTERY_CURRENT( 0x331B, (cc, addr) -> new CurrentField(addr, "Battery CurrentField", "Net battery current (charging minus discharging).", 100, 1)),
     BATTERY_TEMP( 0x331D, (cc, addr) -> new TemperatureField(addr, "Battery Temp", "Battery Temp")),
     AMBIENT_TEMP( 0x331E, (cc, addr) -> new TemperatureField(addr, "Ambient Temp", "Ambient Temp")),
 
@@ -75,6 +75,7 @@ public enum EpeverFieldDefinitions {
     UNDER_VOLTAGE_WARNING( 0x900C, (cc, addr) -> new VoltageField(addr, "Under voltage warning", "Under voltage warning")),
     LOW_VOLTAGE_DISCONNECT( 0x900D, (cc, addr) -> new VoltageField(addr, "Low voltage disconnect", "Low voltage disconnect")),
     DISCHARGING_LIMIT_VOLTAGE( 0x900E, (cc, addr) -> new VoltageField(addr, "Discharging limit voltage", "Discharging limit voltage")),
+
     REAL_TIME_CLOCK( 0x9013, (cc, addr) -> new DateTimeField(addr, "Real time clock", "Register 0: D7-0 Sec, D15-8 Min, Register 1: D7-0 Hour, D15-8 Day, Register 2: D7-0 Month, D15-8 Year")),
     EQUALIZATION_CHARGING_CYCLE( 0x9016, (cc, addr) -> new FloatField(addr, Int, "Equalization charging cycle", "Interval days of auto equalization charging in cycle Day", 1, 1)),
     BATTERY_TEMPERATURE_WARNING_UPPER_LIMIT( 0x9017, (cc, addr) -> new TemperatureField(addr, "Battery temperature warning upper limit", "Battery temperature warning upper limit")),
@@ -88,6 +89,7 @@ public enum EpeverFieldDefinitions {
     LIGHT_SIGNAL_STARTUP_NIGHT_DELAY_TIME( 0x901F, (cc, addr) -> new FloatField(addr, Minutes, "Light signal startup (night) delay time", "PV voltage lower than NTTV, and duration exceeds the Light signal startup (night) delay time, controller would detect it as night time.", 1, 1)),
     DAY_TIME_THRESHOLD_VOLT_DTTV( 0x9020, (cc, addr) -> new VoltageField(addr, "Day Time Threshold Volt.(DTTV)", "PV voltage higher than this value, controller would detect it as sunrise")),
     LIGHT_SIGNAL_TURN_OFF_DAY_DELAY_TIME( 0x9021, (cc, addr) -> new FloatField(addr, Minutes, "Light signal turn off(day) delay time", "PV voltage higher than DTTV, and duration exceeds Light signal turn off(day) delay time delay time, controller would detect it as daytime.", 1, 1)),
+
     LOAD_CONTROLING_MODES( 0x903D, (cc, addr) -> new CodesField(addr, 1, HexCodes.loadControl)),
     WORKING_TIME_LENGTH_1(0x903E, (cc,addr) -> new DurationField(addr,"Load Timer 1 - Duration", "Load terminal enabled for this duration (D15-D8: hour, D7-D0: minute)")),
     WORKING_TIME_LENGTH_2(0x903F, (cc,addr) -> new DurationField(addr,"Load Timer 2 - Duration", "Load terminal enabled for this duration (D15-D8: hour, D7-D0: minute)")),
@@ -103,7 +105,7 @@ public enum EpeverFieldDefinitions {
     BOOST_DURATION(0x906C, (cc,addr) -> new FloatField(addr, Minutes, "Boost duration", "Usually 60-120 minutes.", 1, 1)),
     DISCHARGING_PERCENTAGE(0x906D, (cc,addr) -> new PercentageField(addr, "Discharging percentage", "Usually 20%-80%. The percentage of battery's remaining capacity when stop charging")),
     CHARGING_PERCENTAGE(0x906E, (cc,addr) -> new PercentageField(addr, "Charging percentage", "Depth of charge, 20%-100%.")),
-    MANAGEMENT_MODES_OF_BATTERY_CHARGING_AND_DISCHARGING(0x9070, (cc,addr) -> new CurrentField(addr, "Management modes of battery charging and discharging", "Management modes of battery charge and discharge, voltage compensation : 0 and SOC : 1.")),
+    MANAGEMENT_MODES_OF_BATTERY_CHARGING_AND_DISCHARGING(0x9070, (cc,addr) -> new CodesField(addr, 1, new HexCodes("Battery Charging/Discharging Mode").add(0x00,"Voltage Compensation").add(0x01,"SOC"))),
 
     // Coils
     LOAD_CONTROL_MODE(0x0002, (cc,addr) -> new BooleanField(addr, "Manual Mode On")),

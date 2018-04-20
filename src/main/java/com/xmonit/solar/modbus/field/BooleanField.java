@@ -28,8 +28,19 @@ public class BooleanField extends ModbusField<Boolean> {
     }
 
     @Override
+    public int getCount() {
+        return impl.getCount();
+    }
+
+    @Override
     public Boolean readValue() throws ChargeControllerException {
         this.value = impl.readValue().get(0);
+        this.commitTime = LocalDateTime.now();
+        return this.value;
+    }
+
+    public Boolean readValue(int offset, boolean[] values) throws ChargeControllerException {
+        this.value = impl.readValue(offset, values).get(0);
         this.commitTime = LocalDateTime.now();
         return this.value;
     }
