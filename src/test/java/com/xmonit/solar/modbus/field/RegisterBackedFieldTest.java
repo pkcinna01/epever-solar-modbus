@@ -8,6 +8,8 @@ import com.xmonit.solar.modbus.field.ModbusFieldList;
 import org.junit.Test;
 
 import java.math.BigInteger;
+import java.time.Duration;
+import java.time.LocalTime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,6 +27,7 @@ public class RegisterBackedFieldTest extends ChargeControllerDependentTest {
         }
     }
 
+
     @Test
     public void readInputRegistersBackedFields() throws Exception {
         ModbusFieldList modbusFieldList = ModbusFieldList.createInputRegisterBackedFields(chargeController);
@@ -37,6 +40,7 @@ public class RegisterBackedFieldTest extends ChargeControllerDependentTest {
             System.out.println("\t" + registerBackedField);
         }
     }
+
 
     @Test
     public void readHoldingRegistersBackedFields() throws Exception {
@@ -51,29 +55,51 @@ public class RegisterBackedFieldTest extends ChargeControllerDependentTest {
         }
     }
 
+
     @Test
-    public void writeHoldingRegistersBackedFields() throws Exception {
-        CodesField manualModeField = (CodesField) EpeverFieldDefinitions.DEFAULT_LOAD_ON_OFF_IN_MANUAL_MODE.create(chargeController);
-        int manualModeCode = manualModeField.readValue().intValue();
+    public void writeManualModeByValueOrCodeName() throws Exception {
+        CodesField manualMode = (CodesField) EpeverFieldDefinitions.DEFAULT_LOAD_ON_OFF_IN_MANUAL_MODE.create(chargeController);
+        int manualModeCode = manualMode.readValue().intValue();
         System.out.println("Manual mode as integer: " + manualModeCode);
-        System.out.println(manualModeField.name + ": " + manualModeField);
-        manualModeField.writeValue(BigInteger.ZERO);
-        manualModeCode = manualModeField.readValue().intValue();
+        System.out.println(manualMode.name + ": " + manualMode);
+        manualMode.writeValue(BigInteger.ZERO);
+        manualModeCode = manualMode.readValue().intValue();
         assertEquals(0,manualModeCode);
         System.out.println("Manual mode as integer (set to zero): " + manualModeCode);
-        System.out.println(manualModeField.name + ": " + manualModeField);
+        System.out.println(manualMode.name + ": " + manualMode);
 
-        manualModeField.writeValue("ON");
-        manualModeCode = manualModeField.readValue().intValue();
+        manualMode.writeValue("ON");
+        manualModeCode = manualMode.readValue().intValue();
         assertEquals(1,manualModeCode);
         System.out.println("Manual mode as integer (set to 'ON'): " + manualModeCode);
-        System.out.println(manualModeField.name + ": " + manualModeField);
+        System.out.println(manualMode.name + ": " + manualMode);
 
         try {
-            manualModeField.writeValue("Maybe");
+            manualMode.writeValue("Maybe");
             assertTrue(false); // should never get here
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
+
+
+    @Test
+    public void writeLengthOfNightDuration() throws Exception {
+        DurationField lengthOfNight = (DurationField) EpeverFieldDefinitions.LENGTH_OF_NIGHT.create(chargeController);
+        Duration duration = lengthOfNight.readValue();
+        System.out.println(lengthOfNight.name + ": " + lengthOfNight);
+        Duration expectedDuration = duration.plusHours(1).plusMinutes(5);
+        lengthOfNight.writeValue(expectedDuration);
+        lengthOfNight.readValue();
+        System.out.println(lengthOfNight.name + ": " + lengthOfNight);
+        assertEquals(expectedDuration,lengthOfNight.getValue());
+
+        expectedDuration = Duration.ofHours(10).plusMinutes(20);
+        lengthOfNight.writeValue(expectedDuration);
+        System.out.println(lengthOfNight.name + ": " + lengthOfNight);
+        lengthOfNight.readValue();
+        System.out.println(lengthOfNight.name + ": " + lengthOfNight);
+        assertEquals(expectedDuration,lengthOfNight.getValue());
+    }
+
 }

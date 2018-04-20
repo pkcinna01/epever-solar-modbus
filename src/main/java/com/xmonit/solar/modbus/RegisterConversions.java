@@ -4,6 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -48,6 +49,29 @@ public class RegisterConversions {
         return fromBytes(bytes);
     }
 
+    public static int[] fromDuration(Duration duration, int registerCount) {
+        if ( registerCount == 1 ) {
+            // just have room for hour and minute
+            byte[] bytes = new byte[2];
+            long hours = duration.toHours();
+            long minutes = duration.minusHours(hours).toMinutes();
+            bytes[0] = (byte) minutes;
+            bytes[1] = (byte) hours;
+            return fromBytes(bytes);
+        } else if ( registerCount == 3 ) {
+            int[] registers = new int[3];
+            long hours = duration.toHours();
+            long minutes = duration.minusHours(hours).toMinutes();
+            long seconds = duration.minusHours(hours).minusMinutes(minutes).getSeconds();
+            registers[0] = (int) seconds;
+            registers[1] = (int) minutes;
+            registers[2] = (int) hours;
+            return registers;
+        } else {
+            throw new RuntimeException("Unsupported register count during LocalTime to registers conversion");
+        }
+    }
+
     public static int[] fromTime(LocalTime time, int registerCount) {
         if ( registerCount == 1 ) {
             // just have room for hour and minute
@@ -65,7 +89,6 @@ public class RegisterConversions {
             throw new RuntimeException("Unsupported register count during LocalTime to registers conversion");
         }
     }
-
 
     public static byte[] toBytes(int offset, int count, int[] registers) {
         if ( registers.length < offset+count) {
@@ -109,15 +132,33 @@ public class RegisterConversions {
         return LocalDateTime.of(date,time);
     }
 
-    public static LocalTime toTime(int offset, int count, int[] registers) {
+    public static Duration toDuration(int offset, int count, int[] registers) {
 
-        LocalTime time = null;
+        Duration duration;
 
         if ( count == 1 ) {
             // just have hours and minutes from single register
             byte[] bytes = RegisterConversions.toBytes(offset, count, registers);
-            time = LocalTime.of(bytes[1],bytes[0],0);
+            duration = Duration.ofHours(bytes[1]).plusMinutes(bytes[0]);
         } else if ( count == 3 ) {
+            int hours = registers[2], minutes = registers[1], seconds = registers[0];
+            duration = Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
+        } else {
+            throw new RuntimeException("Unsupported register count during registers to LocalTime conversion. Count=" + count);
+        }
+
+        return duration;
+    }
+
+    public static LocalTime toTime(int offset, int count, int[] registers) {
+
+        LocalTime time = null;
+
+        if ( registers.length == 1 ) {
+            // just have hours and minutes from single register
+            byte[] bytes = RegisterConversions.toBytes(offset, count, registers);
+            time = LocalTime.of(bytes[1],bytes[0],0);
+        } else if ( registers.length == 3 ) {
             int hours = registers[2], minutes = registers[1], seconds = registers[0];
             time = LocalTime.of(hours,minutes,seconds);
         } else {

@@ -3,14 +3,14 @@ package com.xmonit.solar.modbus.field;
 import com.xmonit.solar.modbus.RegisterConversions;
 import com.xmonit.solar.modbus.units.Unit;
 
-import java.time.LocalTime;
+import java.time.Duration;
 
 /*
 D7-0 Sec, D15-8 Min
 D7-0 Hour, D15-8 Day
 D7-0 Month, D15-8 Year
 */
-public class DurationField extends RegisterBackedField<LocalTime> {
+public class DurationField extends RegisterBackedField<Duration> {
 
 
     public DurationField(int addr, String name, String description) {
@@ -19,15 +19,15 @@ public class DurationField extends RegisterBackedField<LocalTime> {
 
 
     @Override
-    public LocalTime fromRegisters(int offset, int[] registers) {
+    public Duration fromRegisters(int offset, int[] registers) {
 
-        return RegisterConversions.toTime(offset, registerCount, registers);
+        return RegisterConversions.toDuration(offset, registerCount, registers);
     }
 
     @Override
-    public int[] toRegisters(LocalTime val) {
+    public int[] toRegisters(Duration val) {
 
-        return RegisterConversions.fromTime(val,registerCount);
+        return RegisterConversions.fromDuration(val,registerCount);
     }
 
 }

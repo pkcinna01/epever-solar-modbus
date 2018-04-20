@@ -7,43 +7,52 @@ import com.intelligt.modbus.jlibmodbus.master.ModbusMasterFactory;
 import com.intelligt.modbus.jlibmodbus.msg.base.mei.MEIReadDeviceIdentification;
 import com.intelligt.modbus.jlibmodbus.msg.base.mei.ReadDeviceIdentificationCode;
 import com.intelligt.modbus.jlibmodbus.serial.*;
-import com.xmonit.solar.modbus.field.ModbusField;
+
 import purejavacomm.CommPortIdentifier;
+//import jssc.SerialPortList;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class EpeverChargeController extends ChargeController {
 
+    static Function<Pattern,List<String>> findDeviceNamesImpl;
+
+    /*static List<String> findDeviceNamesJsscImpl(Pattern pattern) {
+        return Stream.of(SerialPortList.getPortNames())
+                .filter(name->pattern.matcher(name).matches())
+                .collect(Collectors.toList());
+    }*/
+
+    static List<String> findDeviceNamesPjcImpl(Pattern pattern) {
+        return Collections.list(CommPortIdentifier.getPortIdentifiers()).stream()
+                .filter(id->id.getPortType() == CommPortIdentifier.PORT_SERIAL).map(id->id.getName())
+                .filter(n->pattern.matcher(n).matches())
+                .collect(Collectors.toList());
+    }
+
     static {
         //SerialUtils.setSerialPortFactory(new SerialPortFactoryJSSC());
+        //findDeviceNamesImpl = EpeverChargeController::findDeviceNamesJsscImpl;
+
+        SerialUtils.setSerialPortFactory(new SerialPortFactoryPJC());
+        findDeviceNamesImpl = EpeverChargeController::findDeviceNamesPjcImpl;
+
         //SerialUtils.setSerialPortFactory(new SerialPortFactoryRXTX());
         //SerialUtils.setSerialPortFactory(new SerialPortFactoryJSSC());
         //SerialUtils.setSerialPortFactory(new SerialPortFactoryJavaComm());
-        SerialUtils.setSerialPortFactory(new SerialPortFactoryPJC());
     }
 
     SerialParameters serialParameters;
     ModbusMaster modbusMaster;
 
     public static List<String> findDeviceNames(Pattern pattern) {
-        List<String> deviceNames = new LinkedList<>();
-        Enumeration portList = CommPortIdentifier.getPortIdentifiers();
-        while (portList.hasMoreElements()) {
-            CommPortIdentifier id = (CommPortIdentifier) portList.nextElement();
-            if (id.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-                String portName = id.getName();
-                if (pattern.matcher(portName).matches()) {
-                    deviceNames.add(portName);
-                }
-            }
-        }
-        return deviceNames;
+        return findDeviceNamesImpl.apply(pattern);
     }
 
     @Override

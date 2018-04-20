@@ -11,6 +11,7 @@ public abstract class ChargeControllerDependentTest {
   @Before
   public void setUp() throws Exception {
     chargeController.init("ttyXRUSB1");
+    //chargeController.init("ttyACM0");
     chargeController.connect();
   }
 

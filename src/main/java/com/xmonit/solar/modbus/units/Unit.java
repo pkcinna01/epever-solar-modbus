@@ -1,6 +1,6 @@
 package com.xmonit.solar.modbus.units;
 
-import java.time.LocalTime;
+import java.time.Duration;
 
 public class Unit {
 
@@ -31,11 +31,13 @@ public class Unit {
             Minutes = new Unit("minutes", "min"),
             Time = new Time.SecondsMinutesHours("time"),
             DateTime = new Time.SecondsMinutesHoursDayMonthYear("date/time"),
-            Duration = new Unit("duration (hh:mm)", "hh:mm") {
+            Duration = new Unit("duration (hh:mm)", "hh::mm") {
                 @Override
                 public String asString(Object val) {
-                    LocalTime t = (LocalTime) val;
-                    return val != null ? String.format("%02d:%02d (%s)",t.getHour(),t.getMinute(),abbr) : null;
+                    Duration d = (java.time.Duration) val;
+                    long hours = d.toHours();
+                    long minutes = d.minusHours(hours).toMinutes();
+                    return val != null ? String.format("%02d:%02d (%s)",hours,minutes,abbr) : null;
                 }
             };
 

@@ -6,6 +6,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HexCodes extends Unit {
 
@@ -67,9 +69,9 @@ public class HexCodes extends Unit {
         }
     }
 
+
     public HexCodes(String name) {
         super(name, name);
-        //bitRangeContextList.add( new BitRangeContext() );
     }
 
     public HexCodes bitRange(int start, int end) {
@@ -91,6 +93,14 @@ public class HexCodes extends Unit {
         }
         bitRangeContextList.get(bitRangeContextList.size() -1).flags.add( Pair.of(value,desc) );
         return this;
+    }
+
+    public Map<String,Integer> codesByName() {
+        return codesByName("");
+    }
+
+    public Map<String,Integer> codesByName(String bitRangeName) {
+        return bitRangeContextList.stream().filter(brc->bitRangeName.equals(brc.name)).findFirst().map(brc->brc.flags).get().stream().collect(Collectors.toMap(Pair::getValue,Pair::getKey));
     }
 
     public int findByName(String codeName ) throws Exception {

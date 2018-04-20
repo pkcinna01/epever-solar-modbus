@@ -50,10 +50,10 @@ public class ModbusFieldList extends ArrayList<ModbusField> {
             if (lastAddr == -1
                     || f.addr - lastAddr > maxAddressGap
                     || lastAddr < 0x1000 && f.addr >= 0x1000
-                    || lastAddr < 0x2000 && f.addr >= 0x2000
+                    || f.addr == 0x2000
+                    || f.addr == 0x200C
                     || lastAddr < 0x3000 && f.addr >= 0x3000
                     || lastAddr < 0x9000 && f.addr >= 0x9000
-                    || lastAddr <= 0x2000 && f.addr > 0x2000
                     || lastAddr <= 0x300D && f.addr > 0x300D
                     || lastAddr <= 0x3106 && f.addr > 0x3106
                     || lastAddr <= 0x3112 && f.addr > 0x3112
