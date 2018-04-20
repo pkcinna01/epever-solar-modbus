@@ -31,7 +31,7 @@ public class Unit {
             Minutes = new Unit("minutes", "min"),
             Time = new Time.SecondsMinutesHours("time"),
             DateTime = new Time.SecondsMinutesHoursDayMonthYear("date/time"),
-            Duration = new Unit("duration (hh:mm)", "hh::mm") {
+            Duration = new Unit("duration (hh:mm)", "hh:mm") {
                 @Override
                 public String asString(Object val) {
                     Duration d = (java.time.Duration) val;

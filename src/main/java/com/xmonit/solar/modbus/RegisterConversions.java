@@ -144,7 +144,7 @@ public class RegisterConversions {
             int hours = registers[2], minutes = registers[1], seconds = registers[0];
             duration = Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
         } else {
-            throw new RuntimeException("Unsupported register count during registers to LocalTime conversion. Count=" + count);
+            throw new RuntimeException("Unsupported register count in registers to LocalTime conversion. Count=" + count);
         }
 
         return duration;
@@ -154,15 +154,15 @@ public class RegisterConversions {
 
         LocalTime time = null;
 
-        if ( registers.length == 1 ) {
+        if ( count == 1 ) {
             // just have hours and minutes from single register
             byte[] bytes = RegisterConversions.toBytes(offset, count, registers);
             time = LocalTime.of(bytes[1],bytes[0],0);
-        } else if ( registers.length == 3 ) {
+        } else if ( count == 3 ) {
             int hours = registers[2], minutes = registers[1], seconds = registers[0];
             time = LocalTime.of(hours,minutes,seconds);
         } else {
-            throw new RuntimeException("Unsupported register count during registers to LocalTime conversion. Count=" + count);
+            throw new RuntimeException("Unsupported register count in registers-->LocalTime conversion. Count=" + count);
         }
 
         return time;
