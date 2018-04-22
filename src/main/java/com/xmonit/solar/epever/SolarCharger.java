@@ -10,20 +10,13 @@ import static com.intelligt.modbus.jlibmodbus.Modbus.MIN_SERVER_ADDRESS;
 
 abstract public class SolarCharger {
 
-    public static String hex(int i) {
+    protected static String hex(int i) {
         return String.format("0x%04X",i);
     }
 
-    static Integer idCounter = MIN_SERVER_ADDRESS; // increment each time a charge controller is created
-    int id;
+    int serverAddressId = MIN_SERVER_ADDRESS;
 
     String serialName;
-
-    public SolarCharger() {
-        synchronized(idCounter) {
-            id = idCounter++;
-        }
-    }
 
     abstract public void connect() throws ModbusIOException;
 
@@ -43,8 +36,13 @@ abstract public class SolarCharger {
 
     abstract public void writeCoils(int addr, boolean[] coils) throws EpeverException;
 
-    public void init(String deviceName) throws SerialPortException {
+    public void init(String deviceName, int serverAddressId) throws SerialPortException {
         this.serialName = deviceName;
+        this.serverAddressId = serverAddressId;
+    };
+
+    public void init(String deviceName) throws SerialPortException {
+        this.init(deviceName,MIN_SERVER_ADDRESS);
     };
 
     public String getSerialName() {

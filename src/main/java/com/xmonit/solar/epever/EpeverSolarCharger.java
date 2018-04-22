@@ -8,8 +8,9 @@ import com.intelligt.modbus.jlibmodbus.msg.base.mei.MEIReadDeviceIdentification;
 import com.intelligt.modbus.jlibmodbus.msg.base.mei.ReadDeviceIdentificationCode;
 import com.intelligt.modbus.jlibmodbus.serial.*;
 
-import purejavacomm.CommPortIdentifier;
+//import purejavacomm.CommPortIdentifier;
 //import jssc.SerialPortList;
+//import com.fazecast.jSerialComm.SerialPort;
 
 import java.nio.charset.Charset;
 import java.util.*;
@@ -22,31 +23,26 @@ public class EpeverSolarCharger extends SolarCharger {
 
     static Function<Pattern,List<String>> findSerialNamesImpl;
 
-    /*static List<String> findSerialNamesJsscImpl(Pattern pattern) {
-        return Stream.of(SerialPortList.getPortNames())
-                .filter(name->pattern.matcher(name).matches())
-                .collect(Collectors.toList());
-    }*/
-
-    static List<String> findSerialNamesPjcImpl(Pattern pattern) {
-        return Collections.list(CommPortIdentifier.getPortIdentifiers()).stream()
-                .filter(id->id.getPortType() == CommPortIdentifier.PORT_SERIAL).map(id->id.getName())
-                .filter(n->pattern.matcher(n).matches())
-                .collect(Collectors.toList());
-    }
-
     static {
-        //SerialUtils.setSerialPortFactory(new SerialPortFactoryJSSC());
-        //findSerialNamesImpl = EpeverSolarCharger::findSerialNamesJsscImpl;
+        SerialUtils.setSerialPortFactory( new SerialPortFactoryJSerialComm());
+        findSerialNamesImpl = (pattern) -> Arrays.stream(com.fazecast.jSerialComm.SerialPort.getCommPorts())
+                .map(port->port.getSystemPortName()).filter(n->pattern.matcher(n).matches()).collect(Collectors.toList());
 
-        SerialUtils.setSerialPortFactory(new SerialPortFactoryPJC());
-        findSerialNamesImpl = EpeverSolarCharger::findSerialNamesPjcImpl;
+        //SerialUtils.setSerialPortFactory(new SerialPortFactoryJSSC());
+        //findSerialNamesImpl = (pattern) -> Stream.of(jssc.SerialPortList.getPortNames())
+        //      .filter(name->pattern.matcher(name).matches()).collect(Collectors.toList());
+
+        //SerialUtils.setSerialPortFactory(new SerialPortFactoryPJC());
+        //findSerialNamesImpl = (pattern) -> Collections.list(purejavacomm.CommPortIdentifier.getPortIdentifiers()).stream()
+        //      .filter(id->id.getPortType() == purejavacomm.CommPortIdentifier.PORT_SERIAL).map(id->id.getName())
+        //      .filter(n->pattern.matcher(n).matches()).collect(Collectors.toList());
 
         //SerialUtils.setSerialPortFactory(new SerialPortFactoryRXTX());
         //SerialUtils.setSerialPortFactory(new SerialPortFactoryJavaComm());
     }
 
     SerialParameters serialParameters;
+
     ModbusMaster modbusMaster;
 
     public static List<String> findSerialNames(String strRegEx) {
@@ -102,7 +98,7 @@ public class EpeverSolarCharger extends SolarCharger {
     @Override
     public int[] readInputRegisters(int addr, int registerCount) throws EpeverException {
         try {
-            return modbusMaster.readInputRegisters(id, addr, registerCount);
+            return modbusMaster.readInputRegisters(serverAddressId, addr, registerCount);
         } catch (Exception ex) {
             throw new EpeverException("Failed reading input register(s).  Address="+ hex(addr) + " Count="+registerCount,ex);
         }
@@ -111,7 +107,7 @@ public class EpeverSolarCharger extends SolarCharger {
     @Override
     public int[] readHoldingRegisters(int addr, int registerCount) throws EpeverException {
         try {
-            return modbusMaster.readHoldingRegisters(id, addr, registerCount);
+            return modbusMaster.readHoldingRegisters(serverAddressId, addr, registerCount);
         } catch (Exception ex) {
             throw new EpeverException("Failed reading holding register(s).  Address="+hex(addr)+ " Count="+registerCount,ex);
         }
@@ -120,7 +116,7 @@ public class EpeverSolarCharger extends SolarCharger {
     @Override
     public boolean[] readDiscreteInputs(int addr, int inputCount) throws EpeverException {
         try {
-            return modbusMaster.readDiscreteInputs(id, addr, inputCount);
+            return modbusMaster.readDiscreteInputs(serverAddressId, addr, inputCount);
         } catch (Exception ex) {
             throw new EpeverException("Failed reading discrete input(s).  Address="+hex(addr)+ " Count="+inputCount,ex);
         }
@@ -129,7 +125,7 @@ public class EpeverSolarCharger extends SolarCharger {
     @Override
     public boolean[] readCoils(int addr, int coilCount) throws EpeverException {
         try {
-            return modbusMaster.readCoils(id, addr, coilCount);
+            return modbusMaster.readCoils(serverAddressId, addr, coilCount);
         } catch (Exception ex) {
             throw new EpeverException("Failed reading coil(s).  Address="+hex(addr)+ " Count="+coilCount,ex);
         }
@@ -138,7 +134,7 @@ public class EpeverSolarCharger extends SolarCharger {
     @Override
     public void writeRegisters(int addr, int[] registers) throws EpeverException {
         try {
-            modbusMaster.writeMultipleRegisters(id, addr, registers);
+            modbusMaster.writeMultipleRegisters(serverAddressId, addr, registers);
         } catch (Exception ex) {
             throw new EpeverException("Failed writing holding registers.  Address="+hex(addr)+ " Count="+registers.length,ex);
         }
@@ -147,7 +143,7 @@ public class EpeverSolarCharger extends SolarCharger {
     @Override
     public void writeCoils(int addr, boolean[] coils) throws EpeverException {
         try {
-            modbusMaster.writeMultipleCoils(id, addr, coils);
+            modbusMaster.writeMultipleCoils(serverAddressId, addr, coils);
         } catch (Exception ex) {
             throw new EpeverException("Failed writing coils.  Address="+hex(addr),ex);
         }

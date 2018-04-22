@@ -12,6 +12,8 @@ import java.util.function.Predicate;
 
 public class EpeverFieldList extends ArrayList<EpeverField> {
 
+    public static EpeverFieldList masterFieldList = new EpeverFieldList(null);
+
     public static EpeverFieldList createInputRegisterBackedFields(SolarCharger cc) {
         return new EpeverFieldList(cc, (fieldDef) -> {
             return fieldDef.isInputRegisterBacked();
@@ -28,6 +30,11 @@ public class EpeverFieldList extends ArrayList<EpeverField> {
         return new EpeverFieldList(cc, (fieldDef) -> {
             return fieldDef.isBooleanBacked(); // coils and discrete inputs
         });
+    }
+
+    public static void readValues(SolarCharger solarCharger, List<EpeverField> fields)
+            throws EpeverException {
+        readValues(solarCharger,fields,20);
     }
 
     /**
@@ -125,6 +132,13 @@ public class EpeverFieldList extends ArrayList<EpeverField> {
 
     public void readValues() throws EpeverException {
         EpeverFieldList.readValues(solarCharger, this, 20);
+    }
+
+    public EpeverFieldList setSolarCharger(SolarCharger cc) {
+        for(EpeverField field: this) {
+            field.setSolarCharger(cc);
+        }
+        return this;
     }
 
 }

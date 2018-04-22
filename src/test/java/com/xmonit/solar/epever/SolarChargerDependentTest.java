@@ -10,8 +10,8 @@ public abstract class SolarChargerDependentTest {
 
   @Before
   public void setUp() throws Exception {
-    solarCharger.init("ttyXRUSB1");
-    //solarCharger.init("ttyACM0");
+    //solarCharger.init("ttyXRUSB1");
+    solarCharger.init("ttyXRUSB0");
     solarCharger.connect();
   }
 
