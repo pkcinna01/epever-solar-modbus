@@ -2,13 +2,21 @@ package com.xmonit.solar.epever;
 
 import com.intelligt.modbus.jlibmodbus.exception.ModbusIOException;
 import com.intelligt.modbus.jlibmodbus.serial.*;
-
-import java.util.List;
+import lombok.Data;
+import lombok.ToString;
 
 import static com.intelligt.modbus.jlibmodbus.Modbus.MIN_SERVER_ADDRESS;
 
 
 abstract public class SolarCharger {
+
+    @Data
+    @ToString
+    public class DeviceInfo {
+        public String company;
+        public String model;
+        public String version;
+    }
 
     protected static String hex(int i) {
         return String.format("0x%04X",i);
@@ -18,11 +26,13 @@ abstract public class SolarCharger {
 
     String serialName;
 
+    DeviceInfo deviceInfo;
+
     abstract public void connect() throws ModbusIOException;
 
     abstract public void disconnect() throws ModbusIOException;
 
-    abstract public List<String> getDeviceInfo() throws EpeverException;
+    abstract public DeviceInfo readDeviceInfo() throws EpeverException;
 
     abstract public int[] readInputRegisters(int addr, int registerCount) throws EpeverException;
 
@@ -44,6 +54,13 @@ abstract public class SolarCharger {
     public void init(String deviceName) throws SerialPortException {
         this.init(deviceName,MIN_SERVER_ADDRESS);
     };
+
+    public DeviceInfo getDeviceInfo() throws EpeverException {
+        if ( deviceInfo == null ) {
+            deviceInfo = readDeviceInfo();
+        }
+        return deviceInfo;
+    }
 
     public String getSerialName() {
         return serialName;

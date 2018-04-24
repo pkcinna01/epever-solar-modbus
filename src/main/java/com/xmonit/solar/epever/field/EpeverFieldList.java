@@ -134,11 +134,13 @@ public class EpeverFieldList extends ArrayList<EpeverField> {
         EpeverFieldList.readValues(solarCharger, this, 20);
     }
 
-    public EpeverFieldList setSolarCharger(SolarCharger cc) {
-        for(EpeverField field: this) {
-            field.setSolarCharger(cc);
-        }
+    public EpeverFieldList setSolarCharger(final SolarCharger cc) {
+        this.forEach( field ->  field.setSolarCharger(cc) );
         return this;
     }
 
+    public EpeverFieldList reset() {
+        this.forEach( field ->  field.reset() );
+        return this;
+    }
 }

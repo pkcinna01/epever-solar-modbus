@@ -17,9 +17,7 @@ public class EpeverSolarChargerTest extends SolarChargerDependentTest {
 
   @Test
   public void getDeviceInfo() throws Exception {
-    List<String> infoList = solarCharger.getDeviceInfo();
-    for(String info: infoList) {
-      System.out.println(info);
-    }
+    SolarCharger.DeviceInfo deviceInfo = solarCharger.getDeviceInfo();
+    System.out.println(deviceInfo);
   }
 }

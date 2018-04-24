@@ -20,4 +20,9 @@ public class IntegerField extends RegisterBackedField<BigInteger> {
     public int[] toRegisters(BigInteger val) {
         return RegisterConversions.fromBigInteger(val, denominator);
     }
+
+    @Override
+    public double doubleValue() {
+        return value == null ? Double.NaN : value.doubleValue();
+    }
 }

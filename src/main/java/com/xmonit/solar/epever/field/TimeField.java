@@ -29,4 +29,9 @@ public class TimeField extends RegisterBackedField<LocalTime> {
         return RegisterConversions.fromTime(val,registerCount);
     }
 
+
+    @Override
+    public double doubleValue() {
+        return value == null ? Double.NaN : (double) value.toSecondOfDay();
+    }
 }

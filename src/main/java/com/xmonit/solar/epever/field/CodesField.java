@@ -30,4 +30,9 @@ public class CodesField extends RegisterBackedField<BigInteger> {
         writeValue(BigInteger.valueOf(code));
     }
 
+    @Override
+    public double doubleValue() {
+        return value == null ? Double.NaN : value.doubleValue();
+    }
+
 }

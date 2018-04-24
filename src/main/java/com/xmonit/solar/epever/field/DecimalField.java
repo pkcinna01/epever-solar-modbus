@@ -20,4 +20,7 @@ public class DecimalField extends RegisterBackedField<BigDecimal> {
     public int[] toRegisters(BigDecimal val) {
        return RegisterConversions.fromBigDecimal(val, denominator);
     }
+
+    @Override
+    public double doubleValue() { return value == null ? Double.NaN : value.doubleValue(); }
 }

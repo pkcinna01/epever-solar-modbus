@@ -59,4 +59,9 @@ public class BooleanField extends EpeverField<Boolean> {
         return this;
     }
 
+    @Override
+    public double doubleValue() {
+        return value == null ? Double.NaN : (value ? 1.0 : 0.0);
+    }
+
 }

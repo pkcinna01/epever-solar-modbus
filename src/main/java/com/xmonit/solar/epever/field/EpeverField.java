@@ -3,6 +3,7 @@ package com.xmonit.solar.epever.field;
 import com.xmonit.solar.epever.SolarCharger;
 import com.xmonit.solar.epever.EpeverException;
 import com.xmonit.solar.epever.units.Unit;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -32,6 +33,11 @@ abstract public class EpeverField<T> {
     abstract public void writeValue(T val) throws EpeverException;
 
     abstract int getCount();
+
+    /**
+     * @return Double representation of getValue() used by monitoring systems
+     */
+    public abstract double doubleValue();
 
     public Map<String,Object> getMetaData() {
         return new HashMap<String,Object>(){{
@@ -66,6 +72,10 @@ abstract public class EpeverField<T> {
         return value;
     }
 
+    public String getCamelCaseName() {
+        return StringUtils.uncapitalize(this.name.replaceAll("[ -]", ""));
+    }
+
     public String getDescription() {
         return description;
     }
@@ -73,6 +83,11 @@ abstract public class EpeverField<T> {
     public EpeverField setSolarCharger(SolarCharger cc) {
         this.solarCharger = cc;
         return this;
+    }
+
+    public void reset() {
+        value = null;
+        commitTime = null;
     }
 
     @Override

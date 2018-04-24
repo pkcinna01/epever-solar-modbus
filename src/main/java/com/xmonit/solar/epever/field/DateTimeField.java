@@ -26,4 +26,9 @@ public class DateTimeField extends RegisterBackedField<LocalDateTime> {
         return RegisterConversions.fromDateTime(val);
     }
 
+    @Override
+    public double doubleValue() {
+        return value == null ? Double.NaN : (double) java.util.Date.from(value.atZone(java.time.ZoneId.systemDefault()).toInstant()).getTime();
+    }
+
 }

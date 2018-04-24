@@ -19,8 +19,12 @@ public class MockSolarCharger extends SolarCharger {
     }
 
     @Override
-    public List<String> getDeviceInfo() throws EpeverException {
-        return null;
+    public DeviceInfo readDeviceInfo() throws EpeverException {
+        deviceInfo = new DeviceInfo();
+        deviceInfo.company = "ACME";
+        deviceInfo.model = "Mock Solar Charger";
+        deviceInfo.version = "1.0";
+        return deviceInfo;
     }
 
     @Override

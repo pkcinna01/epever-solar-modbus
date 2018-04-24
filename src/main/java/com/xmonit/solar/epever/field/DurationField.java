@@ -29,4 +29,9 @@ public class DurationField extends RegisterBackedField<Duration> {
         return RegisterConversions.fromDuration(val,registerCount);
     }
 
+    @Override
+    public double doubleValue() {
+        return value == null ? Double.NaN : (double) value.getSeconds();
+    }
+
 }

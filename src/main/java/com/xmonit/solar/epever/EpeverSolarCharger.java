@@ -81,14 +81,14 @@ public class EpeverSolarCharger extends SolarCharger {
     }
 
     @Override
-    public List<String> getDeviceInfo() throws EpeverException {
+    public DeviceInfo readDeviceInfo() throws EpeverException {
         try {
-            List<String> deviceInfo = new ArrayList<>();
+            DeviceInfo deviceInfo = new DeviceInfo();
             MEIReadDeviceIdentification rdi = modbusMaster.readDeviceIdentification(1, 0, ReadDeviceIdentificationCode.BASIC_STREAM_ACCESS);
             ReadDeviceIdentificationInterface.DataObject[] objects = rdi.getObjects();
-            for (ReadDeviceIdentificationInterface.DataObject o : objects) {
-                deviceInfo.add(new String(o.getValue(), Charset.defaultCharset()));
-            }
+            deviceInfo.company = new String(objects[0].getValue(), Charset.defaultCharset());
+            deviceInfo.model = new String(objects[1].getValue(), Charset.defaultCharset());
+            deviceInfo.version = new String(objects[2].getValue(), Charset.defaultCharset());
             return deviceInfo;
         } catch (Exception ex) {
             throw new EpeverException("Failed reading MEI Device Information", ex);

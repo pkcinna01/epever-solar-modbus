@@ -21,4 +21,9 @@ public class FloatField extends RegisterBackedField<Float> {
         return RegisterConversions.fromBigDecimal( new BigDecimal(val), denominator);
     }
 
+    @Override
+    public double doubleValue() {
+        return value == null ? Double.NaN : value.doubleValue();
+    }
+
 }

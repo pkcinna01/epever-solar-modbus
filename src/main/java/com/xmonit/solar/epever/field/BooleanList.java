@@ -62,4 +62,9 @@ public class BooleanList extends EpeverField<List<Boolean>> {
         this.value = valList;
         this.commitTime = LocalDateTime.now();
     }
+
+    @Override
+    public double doubleValue() {
+        return value == null ? Double.NaN : (value.stream().allMatch(v->true) ? 1.0 : 0.0);
+    }
 }
