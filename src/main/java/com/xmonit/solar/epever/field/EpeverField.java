@@ -1,15 +1,23 @@
 package com.xmonit.solar.epever.field;
 
+import com.xmonit.solar.epever.EpeverFieldDefinitions;
 import com.xmonit.solar.epever.SolarCharger;
 import com.xmonit.solar.epever.EpeverException;
 import com.xmonit.solar.epever.units.Unit;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 abstract public class EpeverField<T> {
+
+
+    public static EpeverField createByAddr(SolarCharger cc, int addr) {
+
+        return Arrays.stream(EpeverFieldDefinitions.values()).filter(d->d.registerAddress == addr).findFirst().map(d->d.create(cc)).orElse(null);
+    }
 
     public String name;
     public int addr;

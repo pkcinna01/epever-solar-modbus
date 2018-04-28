@@ -9,7 +9,7 @@ public class EpeverSolarChargerTest extends SolarChargerDependentTest {
 
   @Test
   public void findDeviceNames() {
-    List<String> deviceNames = EpeverSolarCharger.findSerialNames(Pattern.compile("ttyX.*"));
+    List<String> deviceNames = EpeverSolarCharger.findSerialPortNames(Pattern.compile("ttyX.*"));
     for(String deviceName:deviceNames) {
       System.out.println(deviceName);
     }
