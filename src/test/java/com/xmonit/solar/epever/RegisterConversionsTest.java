@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import com.xmonit.solar.epever.field.RegisterConversions;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -58,6 +59,32 @@ public class RegisterConversionsTest {
         registers = IntStream.concat(Arrays.stream(new int[]{0,0,0}),Arrays.stream(registers)).toArray();
         actual = RegisterConversions.toDateTime(3,3,registers);
         assertEquals(now,actual);
+    }
+
+    @Test
+    public void negativeAndPositiveValues() {
+        double[] testVals = {294.94, -294.94, 326.64, -326.64, 900.1, -900.1};
+
+        for(double testVal:testVals) {
+            BigDecimal bigDecimalVal = BigDecimal.valueOf(testVal);
+
+            int[] registers = RegisterConversions.fromBigDecimal(bigDecimalVal,100);
+            byte[] registersAsBytes = RegisterConversions.toBytes(0,registers.length,registers);
+            System.out.println( "testVal: " + testVal);
+            System.out.println( "\tregisters  (as ints): " + RegisterConversions.registersToString(0,registers.length,registers));
+            System.out.println( "\tregisters (as bytes): " + RegisterConversions.bytesToString(registersAsBytes));
+            System.out.println( "new testVal: " + RegisterConversions.toBigDecimal(0,registers.length,registers,100).doubleValue());
+        }
+
+        int lastVal = 0;
+        for ( int val = 0x0000; val <= 0xFFFF; val++ ) {
+            int[] registers = RegisterConversions.fromBigDecimal(BigDecimal.valueOf(val),100);
+            double newVal = RegisterConversions.toBigDecimal(0,registers.length,registers,100).doubleValue();
+            if ( newVal * val< 0 ) {
+                System.out.println("Sign changed for " + val + " (newVal=" +newVal + ") " + String.format(" 0x%02X", newVal));
+            }
+            lastVal = val;
+        }
     }
 
 }

@@ -168,4 +168,27 @@ public class RegisterConversions {
         return time;
     }
 
+
+    public static String bytesToString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for ( byte b: bytes) {
+            if ( sb.length() != 0 ) {
+                sb.append(", ");
+            }
+            sb.append(String.format("0x%02X", b));
+        }
+        return sb.toString();
+    }
+
+    public static String registersToString(int offset, int registerCount, int[] registers) {
+        StringBuilder sb = new StringBuilder();
+        for ( int i = 0; i < registerCount; i++) {
+            if ( sb.length() != 0 ) {
+                sb.append(", ");
+            }
+            sb.append(String.format("0x%08X", registers[offset+i]));
+        }
+        return sb.toString();
+    }
+
 }

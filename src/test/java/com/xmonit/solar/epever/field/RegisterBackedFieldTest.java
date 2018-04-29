@@ -2,10 +2,12 @@ package com.xmonit.solar.epever.field;
 
 import com.xmonit.solar.epever.SolarChargerDependentTest;
 import com.xmonit.solar.epever.EpeverFieldDefinitions;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.math.BigInteger;
 import java.time.Duration;
+import java.time.LocalTime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -52,33 +54,9 @@ public class RegisterBackedFieldTest extends SolarChargerDependentTest {
     }
 
 
-    @Test
-    public void writeManualModeByValueOrCodeName() throws Exception {
-        CodesField manualMode = (CodesField) EpeverFieldDefinitions.DEFAULT_LOAD_ON_OFF_IN_MANUAL_MODE.create(solarCharger);
-        int manualModeCode = manualMode.readValue().intValue();
-        System.out.println("Manual mode as integer: " + manualModeCode);
-        System.out.println(manualMode.name + ": " + manualMode);
-        manualMode.writeValue(BigInteger.ZERO);
-        manualModeCode = manualMode.readValue().intValue();
-        assertEquals(0,manualModeCode);
-        System.out.println("Manual mode as integer (set to zero): " + manualModeCode);
-        System.out.println(manualMode.name + ": " + manualMode);
-
-        manualMode.writeValue("ON");
-        manualModeCode = manualMode.readValue().intValue();
-        assertEquals(1,manualModeCode);
-        System.out.println("Manual mode as integer (set to 'ON'): " + manualModeCode);
-        System.out.println(manualMode.name + ": " + manualMode);
-
-        try {
-            manualMode.writeValue("Maybe");
-            assertTrue(false); // should never get here
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
 
 
+    @Ignore
     @Test
     public void writeLengthOfNightDuration() throws Exception {
         DurationField lengthOfNight = (DurationField) EpeverFieldDefinitions.LENGTH_OF_NIGHT.create(solarCharger);
@@ -96,6 +74,32 @@ public class RegisterBackedFieldTest extends SolarChargerDependentTest {
         lengthOfNight.readValue();
         System.out.println(lengthOfNight.name + ": " + lengthOfNight);
         assertEquals(expectedDuration,lengthOfNight.getValue());
+    }
+
+
+    @Ignore
+    @Test
+    public void writeLoadStartAndStopTimes() throws Exception {
+
+        TimeField turnOnTiming1 = (TimeField) EpeverFieldDefinitions.TURN_ON_TIMING_1.create(solarCharger);
+        TimeField turnOffTiming1 = (TimeField) EpeverFieldDefinitions.TURN_OFF_TIMING_1.create(solarCharger);
+        turnOnTiming1.readValue();
+        turnOffTiming1.readValue();
+        System.out.println(turnOnTiming1.name + ": " + turnOnTiming1.toString());
+        System.out.println(turnOffTiming1.name + ": " + turnOffTiming1.toString());
+
+        {
+            LocalTime onTime = LocalTime.of(8, 30, 0, 0);
+            turnOnTiming1.writeValue(onTime);
+            turnOnTiming1.readValue();
+            System.out.println(turnOnTiming1.name + ": " + turnOnTiming1.toString());
+        }
+        {
+            LocalTime offTime = LocalTime.of(18, 30, 0, 0);
+            turnOffTiming1.writeValue(offTime);
+            turnOffTiming1.readValue();
+            System.out.println(turnOffTiming1.name + ": " + turnOffTiming1.toString());
+        }
     }
 
 }

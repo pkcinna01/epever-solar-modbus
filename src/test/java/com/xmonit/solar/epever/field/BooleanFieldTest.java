@@ -2,6 +2,7 @@ package com.xmonit.solar.epever.field;
 
 import com.xmonit.solar.epever.SolarChargerDependentTest;
 import com.xmonit.solar.epever.EpeverFieldDefinitions;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -19,6 +20,7 @@ public class BooleanFieldTest extends SolarChargerDependentTest {
         }
     }
 
+    @Ignore
     @Test
     public void writeCoil() throws Exception {
         BooleanField loadTestModeField =  (BooleanField) EpeverFieldDefinitions.LOAD_TEST_MODE.create(solarCharger);

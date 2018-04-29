@@ -3,6 +3,7 @@ package com.xmonit.solar.epever.field;
 import com.xmonit.solar.epever.SolarChargerDependentTest;
 import com.xmonit.solar.epever.EpeverException;
 import com.xmonit.solar.epever.EpeverFieldDefinitions;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ public class DateTimeFieldTest extends SolarChargerDependentTest {
         System.out.println(localDateTime3);
     }
 
+    @Ignore
     @Test
     public void writeValue() throws EpeverException {
         DateTimeField dateTimeField = (DateTimeField) EpeverFieldDefinitions.REAL_TIME_CLOCK.create(solarCharger);
