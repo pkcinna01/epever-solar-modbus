@@ -1,11 +1,9 @@
 package com.xmonit.solar.epever.field;
 
 import com.xmonit.solar.epever.SolarChargerDependentTest;
-import com.xmonit.solar.epever.EpeverFieldDefinitions;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalTime;
 

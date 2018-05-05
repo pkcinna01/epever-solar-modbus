@@ -1,6 +1,5 @@
 package com.xmonit.solar.epever.field;
 
-import com.xmonit.solar.epever.EpeverFieldDefinitions;
 import com.xmonit.solar.epever.SolarChargerDependentTest;
 import com.xmonit.solar.epever.EpeverException;
 import com.xmonit.solar.epever.units.HexCodes;
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class CodesFieldTest extends SolarChargerDependentTest {
+public class CodeFieldTest extends SolarChargerDependentTest {
 
     @Test
     public void printCodeValue() {
@@ -48,7 +47,7 @@ public class CodesFieldTest extends SolarChargerDependentTest {
     @Ignore
     @Test
     public void writeManualModeByValueOrCodeName() throws Exception {
-        CodesField manualMode = (CodesField) EpeverFieldDefinitions.DEFAULT_LOAD_ON_OFF_IN_MANUAL_MODE.create(solarCharger);
+        CodeField manualMode = (CodeField) EpeverFieldDefinitions.DEFAULT_LOAD_ON_OFF_IN_MANUAL_MODE.create(solarCharger);
         int manualModeCode = manualMode.readValue().intValue();
         System.out.println("Manual mode as integer: " + manualModeCode);
         System.out.println(manualMode.name + ": " + manualMode);
@@ -76,7 +75,7 @@ public class CodesFieldTest extends SolarChargerDependentTest {
     @Ignore
     @Test
     public void writeLoadControlMode() throws Exception {
-        CodesField loadControlMode = (CodesField) EpeverFieldDefinitions.LOAD_CONTROLING_MODES.create(solarCharger);
+        CodeField loadControlMode = (CodeField) EpeverFieldDefinitions.LOAD_CONTROLING_MODES.create(solarCharger);
         loadControlMode.readValue();
         System.out.println(loadControlMode.name + ": " + loadControlMode.toString());
 

@@ -3,7 +3,6 @@ package com.xmonit.solar.epever.field;
 
 import com.xmonit.solar.epever.SolarCharger;
 import com.xmonit.solar.epever.EpeverException;
-import com.xmonit.solar.epever.EpeverFieldDefinitions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,19 +15,19 @@ public class EpeverFieldList extends ArrayList<EpeverField> {
 
     public static EpeverFieldList createInputRegisterBackedFields(SolarCharger cc) {
         return new EpeverFieldList(cc, (fieldDef) -> {
-            return fieldDef.isInputRegisterBacked();
+            return EpeverField.isInputRegisterBacked(fieldDef.registerAddress);
         });
     }
 
     public static EpeverFieldList createHoldingRegisterBackedFields(SolarCharger cc) {
         return new EpeverFieldList(cc, (fieldDef) -> {
-            return fieldDef.isHoldingRegisterBacked();
+            return EpeverField.isHoldingRegisterBacked(fieldDef.registerAddress);
         });
     }
 
     public static EpeverFieldList createBooleanBackedFields(SolarCharger cc) {
         return new EpeverFieldList(cc, (fieldDef) -> {
-            return fieldDef.isBooleanBacked(); // coils and discrete inputs
+            return EpeverField.isBooleanBacked(fieldDef.registerAddress); // coils and discrete inputs
         });
     }
 
@@ -47,7 +46,7 @@ public class EpeverFieldList extends ArrayList<EpeverField> {
      * @param fields
      * @param maxAddressGap
      */
-    public static void readValues(SolarCharger solarCharger, List<EpeverField> fields, int maxAddressGap)
+    public synchronized static void readValues(SolarCharger solarCharger, List<EpeverField> fields, int maxAddressGap)
             throws EpeverException {
         List<EpeverField> sortedFields = new ArrayList(fields);
         sortedFields.sort((l, r) -> Integer.compare(l.addr, r.addr));
@@ -96,7 +95,7 @@ public class EpeverFieldList extends ArrayList<EpeverField> {
                     int offset = inputField.addr - first.addr;
                     inputField.readValue(offset, registers);
                 }
-            } else if (first.isBitBacked()) {
+            } else if (first.isBooleanBacked()) {
                 int bitCount = last.addr - first.addr + last.getCount();
                 boolean[] bools = first.addr < 0x2000 ?
                                   solarCharger.readCoils(first.addr, bitCount) :

@@ -1,23 +1,32 @@
 package com.xmonit.solar.epever.field;
 
-import com.xmonit.solar.epever.EpeverFieldDefinitions;
 import com.xmonit.solar.epever.SolarCharger;
 import com.xmonit.solar.epever.EpeverException;
 import com.xmonit.solar.epever.units.Unit;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 abstract public class EpeverField<T> {
 
+    JsonNodeFactory factory = JsonNodeFactory.instance;
 
     public static EpeverField createByAddr(SolarCharger cc, int addr) {
 
         return Arrays.stream(EpeverFieldDefinitions.values()).filter(d->d.registerAddress == addr).findFirst().map(d->d.create(cc)).orElse(null);
     }
+
+    public static boolean isBooleanBacked(int addr) { return isCoilBacked(addr) || isDiscreteInputBacked(addr); }
+    public static boolean isCoilBacked(int addr) { return addr < 0x1000; }
+    public static boolean isDiscreteInputBacked(int addr) { return addr >= 0x1000 && addr < 0x3000; }
+    public static boolean isHoldingRegisterBacked(int addr) { return addr >= 0x9000; }
+    public static boolean isInputRegisterBacked(int addr) { return addr >= 0x3000 && addr < 0x9000; }
+    public static boolean isMetric(int addr) { return isInputRegisterBacked(addr)&&!isRating(addr); }
+    public static boolean isStatistic(int addr) { return addr >= 0x3300 && addr <= 0x3314; }
+    public static boolean isRating(int addr) { return addr >= 0x3000 && addr <= 0x300E; }
 
     public String name;
     public int addr;
@@ -47,56 +56,55 @@ abstract public class EpeverField<T> {
      */
     public abstract double doubleValue();
 
-    public Map<String,Object> getMetaData() {
-        return new HashMap<String,Object>(){{
-            put("addr",addr);
-            put("unit", unit.abbr);
-            put("name",name);
-            put("description",getDescription());
-        }};
+
+    public ObjectNode asJson(){
+        ObjectNode n = factory.objectNode();
+        n.put("name",factory.textNode(name));
+        n.put("addr",factory.numberNode(addr));
+        n.put("textValue", factory.textNode(toString()));
+        n.put("value", factory.numberNode(doubleValue()));
+        n.put("description", factory.textNode(getDescription()));
+        n.put("unit", unit.asJson());
+        return n;
     }
 
-    public boolean isCoilBacked() {
-        return addr < 0x1000;
-    }
 
-    public boolean isDiscreteInputBacked() {
-        return addr >= 0x1000 && addr < 0x3000;
-    }
-
-    public boolean isBitBacked() { return isCoilBacked() || isDiscreteInputBacked(); }
-
-    public boolean isInputRegisterBacked() {
-        return addr >= 0x3000 && addr < 0x9000;
-    }
-
-    public boolean isHoldingRegisterBacked() {
-        return addr >= 0x9000;
-    }
-
+    public boolean isBooleanBacked() { return EpeverField.isBooleanBacked(addr); }
+    public boolean isCoilBacked() { return EpeverField.isCoilBacked(addr); }
+    public boolean isDiscreteInputBacked() { return EpeverField.isDiscreteInputBacked(addr); }
+    public boolean isInputRegisterBacked() { return EpeverField.isInputRegisterBacked(addr); }
+    public boolean isHoldingRegisterBacked() { return EpeverField.isHoldingRegisterBacked(addr); }
+    public boolean isMetric() { return EpeverField.isMetric(addr); }
+    public boolean isRating() { return EpeverField.isRating(addr); }
     public boolean isRegisterBacked() { return isInputRegisterBacked() || isHoldingRegisterBacked(); }
+
 
     public T getValue() {
         return value;
     }
 
+
     public String getCamelCaseName() {
         return StringUtils.uncapitalize(this.name.replaceAll("[ -]", ""));
     }
 
+
     public String getDescription() {
         return description;
     }
+
 
     public EpeverField setSolarCharger(SolarCharger cc) {
         this.solarCharger = cc;
         return this;
     }
 
+
     public void reset() {
         value = null;
         commitTime = null;
     }
+
 
     @Override
     public String toString() {
@@ -104,6 +112,13 @@ abstract public class EpeverField<T> {
     }
 
 
-
+    public ObjectNode valueAsJson(){
+        ObjectNode n = factory.objectNode();
+        n.put("name",factory.textNode(name));
+        n.put("addr",factory.numberNode(addr));
+        n.put("textValue", factory.textNode(toString()));
+        n.put("value", factory.numberNode(doubleValue()));
+        return n;
+    }
 
 }

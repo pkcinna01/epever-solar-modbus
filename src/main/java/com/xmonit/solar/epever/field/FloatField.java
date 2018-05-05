@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 public class FloatField extends RegisterBackedField<Float> {
 
+    protected boolean bSigned = true;
 
     public FloatField(int addr, Unit unit, String name, String description, int multiplier, int registerCount) {
         super(addr, unit, name, description, multiplier, registerCount);
@@ -13,7 +14,7 @@ public class FloatField extends RegisterBackedField<Float> {
 
     @Override
     public Float fromRegisters(int offset, int[] registers) {
-        return RegisterConversions.toBigDecimal(offset, registerCount, registers, denominator).floatValue();
+        return RegisterConversions.toBigDecimal(offset, registerCount, registers, denominator,bSigned).floatValue();
     }
 
     @Override

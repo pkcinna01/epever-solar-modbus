@@ -1,5 +1,8 @@
 package com.xmonit.solar.epever.units;
 
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
+
 import java.time.Duration;
 
 public class Unit {
@@ -16,7 +19,7 @@ public class Unit {
     }
 
     public static final Unit
-            Volts = new Unit("VoltageField","V"),
+            Volts = new Unit("Voltage","V"),
             Amps = new Unit("Ampere", "A"),
             AmpHours = new Unit("Ampere hours", "Ah"),
             Watts = new Unit("Watt", "W"),
@@ -50,15 +53,29 @@ public class Unit {
         this.strFormat = strFormat;
     }
 
+
+    public ObjectNode asJson(){
+        JsonNodeFactory factory = JsonNodeFactory.instance;
+        ObjectNode n = factory.objectNode();
+        n.put("name",factory.textNode(name));
+        n.put("abbr",factory.textNode(abbr));
+        n.put("description", factory.textNode(getDescription()));
+        return n;
+    }
+
+
     public Unit(String name, String abbr) {
         this(name,abbr,"%04.2f" );
     }
+
 
     public String asString( Object val ) {
         return String.format(strFormat,val) + " " + abbr;
     }
 
+
     public String getDescription() {
         return name + " (" + abbr + ")";
     }
+
 }

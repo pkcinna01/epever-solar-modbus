@@ -2,7 +2,6 @@ package com.xmonit.solar.epever.field;
 
 import com.xmonit.solar.epever.SolarChargerDependentTest;
 import com.xmonit.solar.epever.EpeverException;
-import com.xmonit.solar.epever.EpeverFieldDefinitions;
 import org.junit.Ignore;
 import org.junit.Test;
 

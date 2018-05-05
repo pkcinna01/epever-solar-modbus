@@ -2,6 +2,9 @@ package com.xmonit.solar.epever.units;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
 
 import java.math.BigInteger;
 import java.util.LinkedList;
@@ -11,10 +14,29 @@ import java.util.stream.Collectors;
 
 public class HexCodes extends Unit {
 
+    JsonNodeFactory factory = JsonNodeFactory.instance;
+
     class BitRangeContext {
-        String name;
+        class Flags extends LinkedList<Pair<Integer,String>>{}
+
+        String name = "";
         int start = 0, end = 15;
-        List<Pair<Integer,String>> flags = new LinkedList();
+        Flags flags = new Flags();
+
+        public ObjectNode asJson(){
+            ObjectNode n = factory.objectNode();
+            n.put("name", factory.textNode(name));
+            ArrayNode flagsNode = factory.arrayNode();
+            for( Pair<Integer,String> flag : flags ){
+                ObjectNode flagNode = factory.objectNode();
+                flagNode.put("id",factory.numberNode(flag.getKey()));
+                flagNode.put("title",factory.textNode(flag.getValue()));
+                flagsNode.add(flagNode);
+            }
+            n.put("flags", flagsNode);
+            return n;
+        }
+
         public String valueToString(int val) {
             for ( Pair<Integer,String> flag : flags ) {
                 if ( flag.getKey().equals(val) ) {
@@ -23,15 +45,40 @@ public class HexCodes extends Unit {
             }
             return "Undefined Code";
         }
+
+        BigInteger getCodeValue(BigInteger bigEndianInt){
+            BigInteger mask = BigInteger.ONE.shiftLeft(end).subtract(BigInteger.ONE);
+            return bigEndianInt.shiftRight(start).and( mask );
+        }
+
+        class Value {
+            int value;
+            Value(int value){
+                this.value = value;
+            }
+            String getName() { return BitRangeContext.this.name; }
+            String getTextValue() { return valueToString(this.value);}
+            ObjectNode asJson() {
+                ObjectNode n = factory.objectNode();
+                n.put("name",factory.textNode(getName()));
+                n.put("value",factory.numberNode(value));
+                n.put("textValue",factory.textNode(getTextValue()));
+                return n;
+            }
+        }
+
+        Value getValue(BigInteger bigEndianInt){
+            BigInteger v = getCodeValue(bigEndianInt);
+            int intVal = v.intValue();
+            return new Value(intVal);
+        }
     }
 
-    List<BitRangeContext> bitRangeContextList = new LinkedList();
-
     public static HexCodes batteryStatus = new HexCodes("Battery Status")
-            .bitRange(0,3, "VoltageField").add(0x00,"Normal").add(0x01,"Over Volt").add(0x02,"Under Volt").add(0x03,"Low Volt Disconnect").add(0x04,"Fault")
-            .bitRange(4,7, "TemperatureField").add(0x00,"Normal").add(0x01,"Over Temp.(Higher than the warning settings)").add(0x02,"Low Temp.(Lower than the warning settings)")
-            .bitRange(8,8,"Battery Internal Resistance").add(0x00,"OK").add(0x01,"Abnormal")
-            .bitRange(15,15,"Identification for Rated VoltageField").add(0x00,"OK").add(0x01,"Invalid");
+            .bitRange(0,3, "Voltage").add(0x00,"Normal").add(0x01,"Over Volt").add(0x02,"Under Volt").add(0x03,"Low Volt Disconnect").add(0x04,"Fault")
+            .bitRange(4,7, "Temperature").add(0x00,"Normal").add(0x01,"Over Temp.(Higher than the warning settings)").add(0x02,"Low Temp.(Lower than the warning settings)")
+            .bitRange(8,8,"Battery Internal Resistance").add(0x00,"Okay").add(0x01,"Abnormal")
+            .bitRange(15,15,"Identification for Rated Voltage").add(0x00,"Okay").add(0x01,"Invalid");
 
     public static HexCodes chargingMode = new HexCodes("Charging Mode")
             .add(0x00,"Connect/disconnect").add(0x01,"PWM").add(0x02,"MPPT");
@@ -43,24 +90,25 @@ public class HexCodes extends Unit {
             .add( 0x01, "Sealed").add(0x02, "GEL").add(0x03, "Flooded").add(0x00, "User defined");
 
     public static HexCodes chargingEquipmentStatus = new HexCodes( "Charging Equipment Status")
-            .bitRange(14,15,"Input VoltageField").add( 0x00, "OK").add(0x01,"No PowerField").add(0x03,"Error")
+            .bitRange(14,15,"Input Voltage").add( 0x00, "Okay").add(0x01,"No Power").add(0x03,"Error")
             .bitRange(13,13,"Charging MOSFET Short").add(0x00,"No").add(0x01,"Yes")
             .bitRange(12,12,"Charging or Anti-reverse MOSFET Short").add(0x00,"No").add(0x01,"Yes")
             .bitRange(11,11,"Anti-reverse MOSFET Short").add(0x00,"No").add(0x01,"Yes")
-            .bitRange(10,10,"Input CurrentField Threshold").add(0x00,"OK").add(0x01,"Exceeded")
-            .bitRange(9,9,"Load CurrentField Threshold").add(0x00,"OK").add(0x01,"Exceeded")
+            .bitRange(10,10,"Input Current Threshold").add(0x00,"Okay").add(0x01,"Exceeded")
+            .bitRange(9,9,"Load Current Threshold").add(0x00,"Okay").add(0x01,"Exceeded")
             .bitRange(8,8,"Load Short").add(0x00,"No").add(0x01,"Yes")
             .bitRange(7,7,"Load MOSFET Short").add(0x00,"No").add(0x01,"Yes")
             .bitRange(4,4,"PV Input Short").add(0x00,"No").add(0x01,"Yes")
-            .bitRange(2,3,"Charging Status").add(0x00,"Idle").add(0x01,"FloatField").add(0x02,"Boost").add(0x03,"Equalization")
+            .bitRange(2,3,"Charging Status").add(0x00,"Idle").add(0x01,"Float").add(0x02,"Boost").add(0x03,"Equalization")
             .bitRange(1,1,"Fault").add(0x00,"No").add(0x01,"Yes")
             .bitRange(0,0,"Status").add(0x00,"Running").add(0x01,"Standby");
 
-    public static HexCodes batteryRatedVoltage = new HexCodes( "Battery Rated VoltageField Mode")
+    public static HexCodes batteryRatedVoltage = new HexCodes( "Battery Rated Voltage Mode")
             .add(0x00,"Auto Recognize").add(0x01,"12V").add(0x02,"24V");
 
     public static HexCodes loadTimingControlMode = new HexCodes( "Load Timing Mode" )
             .add(0x00,"Using One Timer").add(0x01,"Using Two Timer");
+
 
     public static class OnOff extends HexCodes {
         public OnOff(String name) {
@@ -69,14 +117,67 @@ public class HexCodes extends Unit {
         }
     }
 
+    List<BitRangeContext> bitRangeContextList = new LinkedList();
+
 
     public HexCodes(String name) {
         super(name, name);
     }
 
-    public HexCodes bitRange(int start, int end) {
-        return bitRange(start,end,"");
+
+    public HexCodes add(int value, String desc) {
+        if ( bitRangeContextList.isEmpty() ) {
+            bitRangeContextList.add( new BitRangeContext() );
+        }
+        bitRangeContextList.get(bitRangeContextList.size() -1).flags.add( Pair.of(value,desc) );
+        return this;
     }
+
+
+    @Override
+    public ObjectNode asJson(){
+        ObjectNode n = super.asJson();
+        ArrayNode bitRanges = factory.arrayNode();
+        for(BitRangeContext brc: bitRangeContextList) {
+            bitRanges.add(brc.asJson());
+        }
+        n.put("bitRanges", bitRanges);
+        return n;
+    }
+
+
+    public ArrayNode asJson(BigInteger codes) {
+        ArrayNode n = factory.arrayNode();
+        for (BitRangeContext.Value v : valueToCodes((BigInteger) codes)) {
+            n.add(v.asJson());
+        }
+        return n;
+    }
+
+
+    @Override
+    public String asString(Object val) {
+        StringBuilder sb = new StringBuilder();
+        for( BitRangeContext.Value v: valueToCodes((BigInteger) val)){
+            if ( sb.length() != 0 ) {
+                sb.append(", ");
+            }
+            String name = v.getName();
+            if ( name != null  && !name.isEmpty() ) {
+                // null if single bit range context for entire bit set of value registers
+                sb.append( name ).append(": ");
+            }
+            //sb.append(String.format("0x%02X (%s)", v.value, v.getTextValue()));
+            sb.append(v.getTextValue());
+        }
+        return sb.toString();
+    }
+
+
+    //public HexCodes bitRange(int start, int end) {
+    //    return bitRange(start,end,"");
+    //}
+
 
     public HexCodes bitRange(int start, int end, String desc) {
         BitRangeContext brc = new BitRangeContext();
@@ -87,21 +188,16 @@ public class HexCodes extends Unit {
         return this;
     }
 
-    public HexCodes add(int value, String desc) {
-        if ( bitRangeContextList.isEmpty() ) {
-            bitRangeContextList.add( new BitRangeContext() );
-        }
-        bitRangeContextList.get(bitRangeContextList.size() -1).flags.add( Pair.of(value,desc) );
-        return this;
-    }
 
     public Map<String,Integer> codesByName() {
         return codesByName("");
     }
 
+
     public Map<String,Integer> codesByName(String bitRangeName) {
         return bitRangeContextList.stream().filter(brc->bitRangeName.equals(brc.name)).findFirst().map(brc->brc.flags).get().stream().collect(Collectors.toMap(Pair::getValue,Pair::getKey));
     }
+
 
     public int findByName(String codeName ) throws Exception {
         if ( bitRangeContextList.size() > 1 ) {
@@ -116,33 +212,11 @@ public class HexCodes extends Unit {
         throw new Exception("'"+codeName+"' not a valid choice.  " + getDescription());
     }
 
+
     public int findByBitRangeAndName(String bitRangeName, String codeName) throws Exception {
         throw new Exception("Not implemented... need to test setting multiple bit ranges within a register");
     }
 
-    public String asString(Integer val ) {
-        return asString(BigInteger.valueOf(val));
-    }
-
-    @Override
-    public String asString(Object val) {
-
-        BigInteger bigEndianInt = (BigInteger) val;
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < bitRangeContextList.size(); i++ ) {
-            if ( i != 0 ) {
-                sb.append(", ");
-            }
-            BitRangeContext brc = bitRangeContextList.get(i);
-            BigInteger mask = BigInteger.ONE.shiftLeft(brc.end).subtract(BigInteger.ONE);
-            BigInteger codeValue = bigEndianInt.shiftRight(brc.start).and( mask );
-            if( !StringUtils.isEmpty(brc.name)) {
-                sb.append(brc.name).append(": " );
-            }
-            sb.append(String.format("0x%02X (%s)", codeValue.longValue(), brc.valueToString(codeValue.intValue())));
-        }
-        return sb.toString();
-    }
 
     @Override
     public String getDescription() {
@@ -184,5 +258,13 @@ public class HexCodes extends Unit {
         return sb.toString();
     }
 
+    private List<BitRangeContext.Value> valueToCodes(BigInteger val) {
+        List<BitRangeContext.Value> codeValues = new LinkedList<>();
+        for(int i = 0; i < bitRangeContextList.size(); i++ ) {
+            BitRangeContext brc = bitRangeContextList.get(i);
+            codeValues.add( brc.getValue(val) );
+        }
+        return codeValues;
+    }
 
 }

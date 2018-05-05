@@ -90,11 +90,19 @@ public class RegisterConversions {
         }
     }
 
-    public static byte[] toBytes(int offset, int count, int[] registers) {
+    public static byte[] toBytes(int offset, int count, int[] registers){
+        return toBytes(offset,count,registers,true);
+    }
+
+    public static byte[] toBytes(int offset, int count, int[] registers, boolean bSigned) {
         if ( registers.length < offset+count) {
             throw new IndexOutOfBoundsException(String.format("Offset (%d) + register count (%d) exceeds the registers array length (%d). ",offset,count,registers.length));
         }
-        byte[] bytes = new byte[count*2];
+        boolean bConvertToUnsigned = false;
+        if ( !bSigned ) {
+            bConvertToUnsigned = (registers[registers.length-1] & 0x8000) != 0;
+        }
+        byte[] bytes = new byte[count*2+(bConvertToUnsigned?1:0)];
         //System.out.println("toBytes bytes.length=" + bytes.length + " registers.length=" + registers.length + " offset=" + offset);
         for( int i = offset; i < offset+count; i++ ) {
             bytes[2*(i-offset)] = (byte)(registers[i] & 0xFF);
@@ -104,20 +112,32 @@ public class RegisterConversions {
     }
 
     public static BigDecimal toBigDecimal(int offset, int count, int[] registers, int denominator) {
-        byte[] bytes = toBytes(offset,count,registers);
+        return toBigDecimal(offset,count,registers,denominator,true);
+    }
+
+    public static BigDecimal toBigDecimal(int offset, int count, int[] registers, int denominator, boolean bSigned) {
+        byte[] bytes = toBytes(offset,count,registers,bSigned);
         ArrayUtils.reverse(bytes);
         BigInteger bigInt = new BigInteger(bytes);
         return new BigDecimal(bigInt).divide(new BigDecimal(denominator));
     }
 
     public static BigInteger toBigInteger(int offset, int count, int[] registers, int denominator) {
-        byte[] bytes = toBytes(offset,count,registers);
+        return toBigInteger(offset,count,registers,denominator,true);
+    }
+
+    public static BigInteger toBigInteger(int offset, int count, int[] registers, int denominator, boolean bSigned) {
+        byte[] bytes = toBytes(offset,count,registers,bSigned);
         ArrayUtils.reverse(bytes);
         return new BigInteger(bytes).divide( BigInteger.valueOf(denominator));
     }
 
     public static double toDouble(int offset, int count, int[] registers, int denominator) {
-        return toBigDecimal(offset, count, registers, denominator).doubleValue();
+        return toDouble(offset,count,registers,denominator,true);
+    }
+
+    public static double toDouble(int offset, int count, int[] registers, int denominator, boolean bSigned) {
+        return toBigDecimal(offset, count, registers, denominator, bSigned).doubleValue();
     }
 
     public static LocalDateTime toDateTime(int offset, int count, int[] registers) {

@@ -9,6 +9,7 @@ public class PowerField extends FloatField {
     public PowerField(int addr, String name, String description){
 
         super(addr,Unit.Watts,name,description,100,1);
+        bSigned = false;
     }
 
 }

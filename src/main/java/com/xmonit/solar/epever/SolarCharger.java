@@ -5,6 +5,9 @@ import com.intelligt.modbus.jlibmodbus.serial.*;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import static com.intelligt.modbus.jlibmodbus.Modbus.MIN_SERVER_ADDRESS;
 
 
@@ -16,11 +19,14 @@ abstract public class SolarCharger {
         public String company;
         public String model;
         public String version;
+        public String tty;
     }
 
-    protected static String hex(int i) {
-        return String.format("0x%04X",i);
+    public static String hex(int i) {
+        return String.format("0x%08X",i);
     }
+
+    public static String hex(int[] ia) { return Arrays.stream(ia).mapToObj(i ->String.format("%08X",i)).collect(Collectors.joining(" "));}
 
     int serverAddressId = MIN_SERVER_ADDRESS;
 
