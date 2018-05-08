@@ -6,7 +6,10 @@ import org.codehaus.jackson.node.ObjectNode;
 
 import java.math.BigInteger;
 
-
+/**
+ * Also defines a text equivalent for each numeric value.
+ * Used for representing multiple flags or values within a register.
+ */
 public class CodeField extends RegisterBackedField<BigInteger> {
 
     public CodeField(int addr, int registerCount, String description, HexCodes codes){

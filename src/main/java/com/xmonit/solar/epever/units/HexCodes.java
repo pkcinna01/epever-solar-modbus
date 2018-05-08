@@ -75,10 +75,10 @@ public class HexCodes extends Unit {
     }
 
     public static HexCodes batteryStatus = new HexCodes("Battery Status")
-            .bitRange(0,3, "Voltage").add(0x00,"Normal").add(0x01,"Over Volt").add(0x02,"Under Volt").add(0x03,"Low Volt Disconnect").add(0x04,"Fault")
-            .bitRange(4,7, "Temperature").add(0x00,"Normal").add(0x01,"Over Temp.(Higher than the warning settings)").add(0x02,"Low Temp.(Lower than the warning settings)")
+            .bitRange(0,3, "Voltage").add(0x00,"Okay").add(0x01,"Over Volt").add(0x02,"Under Volt").add(0x03,"Low Volt Disconnect").add(0x04,"Fault")
+            .bitRange(4,7, "Temperature").add(0x00,"Okay").add(0x01,"Over Temp.(Higher than the warning settings)").add(0x02,"Low Temp.(Lower than the warning settings)")
             .bitRange(8,8,"Battery Internal Resistance").add(0x00,"Okay").add(0x01,"Abnormal")
-            .bitRange(15,15,"Identification for Rated Voltage").add(0x00,"Okay").add(0x01,"Invalid");
+            .bitRange(15,15,"Identification for Rated Voltage").add(0x00,"Success").add(0x01,"Failed");
 
     public static HexCodes chargingMode = new HexCodes("Charging Mode")
             .add(0x00,"Connect/disconnect").add(0x01,"PWM").add(0x02,"MPPT");
@@ -90,7 +90,7 @@ public class HexCodes extends Unit {
             .add( 0x01, "Sealed").add(0x02, "GEL").add(0x03, "Flooded").add(0x00, "User defined");
 
     public static HexCodes chargingEquipmentStatus = new HexCodes( "Charging Equipment Status")
-            .bitRange(14,15,"Input Voltage").add( 0x00, "Okay").add(0x01,"No Power").add(0x03,"Error")
+            .bitRange(14,15,"Input Voltage").add( 0x00, "Okay").add(0x01,"No Power").add(0x02,"High").add(0x03,"Error")
             .bitRange(13,13,"Charging MOSFET Short").add(0x00,"No").add(0x01,"Yes")
             .bitRange(12,12,"Charging or Anti-reverse MOSFET Short").add(0x00,"No").add(0x01,"Yes")
             .bitRange(11,11,"Anti-reverse MOSFET Short").add(0x00,"No").add(0x01,"Yes")
@@ -100,7 +100,7 @@ public class HexCodes extends Unit {
             .bitRange(7,7,"Load MOSFET Short").add(0x00,"No").add(0x01,"Yes")
             .bitRange(4,4,"PV Input Short").add(0x00,"No").add(0x01,"Yes")
             .bitRange(2,3,"Charging Status").add(0x00,"Idle").add(0x01,"Float").add(0x02,"Boost").add(0x03,"Equalization")
-            .bitRange(1,1,"Fault").add(0x00,"No").add(0x01,"Yes")
+            .bitRange(1,1,"Fault").add(0x00,"No").add(0x01,"Yes") // why is this always Yes?
             .bitRange(0,0,"Status").add(0x00,"Running").add(0x01,"Standby");
 
     public static HexCodes batteryRatedVoltage = new HexCodes( "Battery Rated Voltage Mode")

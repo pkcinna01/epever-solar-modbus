@@ -129,7 +129,7 @@ public class EpeverFieldList extends ArrayList<EpeverField> {
         }
     }
 
-    public void readValues() throws EpeverException {
+    public synchronized void readValues() throws EpeverException {
         EpeverFieldList.readValues(solarCharger, this, 20);
     }
 
@@ -138,8 +138,16 @@ public class EpeverFieldList extends ArrayList<EpeverField> {
         return this;
     }
 
-    public EpeverFieldList reset() {
+    public synchronized EpeverFieldList reset() {
         this.forEach( field ->  field.reset() );
         return this;
+    }
+
+    public synchronized void updateValues(List<EpeverField> srcFields) {
+        for( EpeverField field: this ) {
+            srcFields.stream().filter(srcField->srcField.addr == field.addr).findFirst().ifPresent(srcField->
+               field.value = srcField.value
+            );
+        }
     }
 }

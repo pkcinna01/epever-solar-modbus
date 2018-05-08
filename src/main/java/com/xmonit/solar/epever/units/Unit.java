@@ -19,19 +19,19 @@ public class Unit {
     }
 
     public static final Unit
-            Volts = new Unit("Voltage","V"),
-            Amps = new Unit("Ampere", "A"),
-            AmpHours = new Unit("Ampere hours", "Ah"),
-            Watts = new Unit("Watt", "W"),
+            Volts = new Unit("Volt(s)","V"),
+            Amps = new Unit("Amp(s)", "A"),
+            AmpHours = new Unit("Amp hour(s)", "Ah"),
+            Watts = new Unit("Watt(s)", "W"),
             Celcius = new Unit("Degrees Celsius", "\u2103" ), //"\u00b0"),
             Fahrenheit = new Unit("Degrees Fahrenheit", "\u2109" ), //"\u00b0"),
-            Percent = new Unit("%, PercentageField", "%"),
-            KWH = new Unit("KWH, Kilowatt/Hour", "KWH"),
-            Ton = new Unit("1000kg", "t"),
+            Percent = new Unit("Percent", "%"),
+            KWH = new Unit("Kilowatt(s)/Hour", "KWH"),
+            Ton = new Unit("Ton(s)", "t"),
             mOHM = new Unit("milliohm", "mOHM"),
             Int = new EmptyUnit("integer", ""),
             Bool = new EmptyUnit("boolean", "true or false"),
-            Minutes = new Unit("minutes", "min"),
+            Minutes = new Unit("minute(s)", "min"),
             Time = new Time.SecondsMinutesHours("time"),
             DateTime = new Time.SecondsMinutesHoursDayMonthYear("date/time"),
             Duration = new Unit("duration (hh:mm)", "hh:mm") {

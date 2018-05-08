@@ -98,7 +98,7 @@ public class EpeverSolarCharger extends SolarCharger {
             deviceInfo.company = new String(objects[0].getValue(), Charset.defaultCharset());
             deviceInfo.model = new String(objects[1].getValue(), Charset.defaultCharset());
             deviceInfo.version = new String(objects[2].getValue(), Charset.defaultCharset());
-            deviceInfo.tty = this.getSerialName();
+            deviceInfo.commPort = this.getSerialName();
             return deviceInfo;
         } catch (Exception ex) {
             throw new EpeverException("Failed reading MEI Device Information", ex);

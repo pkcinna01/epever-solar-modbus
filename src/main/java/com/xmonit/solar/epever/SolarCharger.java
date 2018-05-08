@@ -19,7 +19,7 @@ abstract public class SolarCharger {
         public String company;
         public String model;
         public String version;
-        public String tty;
+        public String commPort;
     }
 
     public static String hex(int i) {
