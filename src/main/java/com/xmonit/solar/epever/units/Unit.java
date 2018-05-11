@@ -19,22 +19,22 @@ public class Unit {
     }
 
     public static final Unit
-            Volts = new Unit("Volt(s)","V"),
-            Amps = new Unit("Amp(s)", "A"),
-            AmpHours = new Unit("Amp hour(s)", "Ah"),
-            Watts = new Unit("Watt(s)", "W"),
+            Volts = new Unit("Volts","V"),
+            Amps = new Unit("Amps", "A"),
+            AmpHours = new Unit("Amp Hours", "Ah"),
+            Watts = new Unit("Watts", "W"),
             Celcius = new Unit("Degrees Celsius", "\u2103" ), //"\u00b0"),
             Fahrenheit = new Unit("Degrees Fahrenheit", "\u2109" ), //"\u00b0"),
             Percent = new Unit("Percent", "%"),
-            KWH = new Unit("Kilowatt(s)/Hour", "KWH"),
-            Ton = new Unit("Ton(s)", "t"),
+            KWH = new Unit("Kilowatts/Hour", "KWH"),
+            Ton = new Unit("Tons", "t"),
             mOHM = new Unit("milliohm", "mOHM"),
             Int = new EmptyUnit("integer", ""),
             Bool = new EmptyUnit("boolean", "true or false"),
-            Minutes = new Unit("minute(s)", "min"),
+            Minutes = new Unit("minutes", "min"),
             Time = new Time.SecondsMinutesHours("time"),
-            DateTime = new Time.SecondsMinutesHoursDayMonthYear("date/time"),
-            Duration = new Unit("duration (hh:mm)", "hh:mm") {
+            DateTime = new Time.SecondsMinutesHoursDayMonthYear("datetime"),
+            Duration = new Unit("duration", "hh:mm") {
                 @Override
                 public String asString(Object val) {
                     Duration d = (java.time.Duration) val;

@@ -26,14 +26,14 @@ public class HexCodes extends Unit {
         public ObjectNode asJson(){
             ObjectNode n = factory.objectNode();
             n.put("name", factory.textNode(name));
-            ArrayNode flagsNode = factory.arrayNode();
+            ArrayNode choicesNode = factory.arrayNode();
             for( Pair<Integer,String> flag : flags ){
-                ObjectNode flagNode = factory.objectNode();
-                flagNode.put("id",factory.numberNode(flag.getKey()));
-                flagNode.put("title",factory.textNode(flag.getValue()));
-                flagsNode.add(flagNode);
+                ObjectNode choiceNode = factory.objectNode();
+                choiceNode.put("value",factory.numberNode(flag.getKey()));
+                choiceNode.put("text",factory.textNode(flag.getValue()));
+                choicesNode.add(choiceNode);
             }
-            n.put("flags", flagsNode);
+            n.put("choices", choicesNode);
             return n;
         }
 
@@ -47,6 +47,9 @@ public class HexCodes extends Unit {
         }
 
         BigInteger getCodeValue(BigInteger bigEndianInt){
+            if ( bigEndianInt == null ) {
+                return null;
+            }
             BigInteger mask = BigInteger.ONE.shiftLeft(end).subtract(BigInteger.ONE);
             return bigEndianInt.shiftRight(start).and( mask );
         }
@@ -62,14 +65,14 @@ public class HexCodes extends Unit {
                 ObjectNode n = factory.objectNode();
                 n.put("name",factory.textNode(getName()));
                 n.put("value",factory.numberNode(value));
-                n.put("textValue",factory.textNode(getTextValue()));
+                n.put("text",factory.textNode(getTextValue()));
                 return n;
             }
         }
 
         Value getValue(BigInteger bigEndianInt){
             BigInteger v = getCodeValue(bigEndianInt);
-            int intVal = v.intValue();
+            int intVal = v != null ? v.intValue() : -1;
             return new Value(intVal);
         }
     }
@@ -121,7 +124,7 @@ public class HexCodes extends Unit {
 
 
     public HexCodes(String name) {
-        super(name, name);
+        super(name, "choice");
     }
 
 
@@ -158,17 +161,19 @@ public class HexCodes extends Unit {
     @Override
     public String asString(Object val) {
         StringBuilder sb = new StringBuilder();
-        for( BitRangeContext.Value v: valueToCodes((BigInteger) val)){
-            if ( sb.length() != 0 ) {
-                sb.append(", ");
+        if ( val != null ) {
+            for (BitRangeContext.Value v : valueToCodes((BigInteger) val)) {
+                if (sb.length() != 0) {
+                    sb.append(", ");
+                }
+                String name = v.getName();
+                if (name != null && !name.isEmpty()) {
+                    // null if single bit range context for entire bit set of value registers
+                    sb.append(name).append(": ");
+                }
+                //sb.append(String.format("0x%02X (%s)", v.value, v.getTextValue()));
+                sb.append(v.getTextValue());
             }
-            String name = v.getName();
-            if ( name != null  && !name.isEmpty() ) {
-                // null if single bit range context for entire bit set of value registers
-                sb.append( name ).append(": ");
-            }
-            //sb.append(String.format("0x%02X (%s)", v.value, v.getTextValue()));
-            sb.append(v.getTextValue());
         }
         return sb.toString();
     }

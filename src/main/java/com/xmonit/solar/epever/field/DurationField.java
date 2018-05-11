@@ -2,6 +2,7 @@ package com.xmonit.solar.epever.field;
 
 import com.xmonit.solar.epever.units.Unit;
 
+import java.text.ParseException;
 import java.time.Duration;
 
 /*
@@ -33,5 +34,12 @@ public class DurationField extends RegisterBackedField<Duration> {
     public double doubleValue() {
         return value == null ? Double.NaN : (double) value.getSeconds();
     }
+
+    public static Duration parse(String strVal) throws ParseException {
+        TimeField.Parser tp = new TimeField.Parser(strVal);
+        Duration duration = Duration.ofHours(tp.hours).plusMinutes(tp.minutes).plusSeconds(tp.seconds);
+        return duration;
+    }
+
 
 }

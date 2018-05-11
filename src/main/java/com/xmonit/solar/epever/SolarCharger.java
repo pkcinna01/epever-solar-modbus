@@ -68,6 +68,24 @@ abstract public class SolarCharger {
         return deviceInfo;
     }
 
+    public static interface ConnectionOp {
+        public void run() throws Exception;
+    }
+
+    public synchronized SolarCharger withConnection( ConnectionOp op ) throws Exception {
+        try {
+            this.connect();
+            try {
+                op.run();
+            } catch (Exception ex) {
+                throw ex;
+            }
+        } finally {
+            this.disconnect();
+        }
+        return this;
+    }
+
     public String getSerialName() {
         return serialName;
     }

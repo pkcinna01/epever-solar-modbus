@@ -31,4 +31,8 @@ public class DateTimeField extends RegisterBackedField<LocalDateTime> {
         return value == null ? Double.NaN : (double) java.util.Date.from(value.atZone(java.time.ZoneId.systemDefault()).toInstant()).getTime();
     }
 
+    public static LocalDateTime parse(String strVal) {
+        return LocalDateTime.parse(strVal);
+    }
+
 }

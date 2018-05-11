@@ -4,9 +4,11 @@ import com.xmonit.solar.epever.SolarCharger;
 import com.xmonit.solar.epever.EpeverException;
 import com.xmonit.solar.epever.units.Unit;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -94,6 +96,12 @@ abstract public class EpeverField<T> {
     }
 
 
+    @JsonProperty()
+    public String getTextValue() {
+        return toString();
+    }
+
+
     public EpeverField setSolarCharger(SolarCharger cc) {
         this.solarCharger = cc;
         return this;
@@ -104,7 +112,6 @@ abstract public class EpeverField<T> {
         value = null;
         commitTime = null;
     }
-
 
     @Override
     public String toString() {
@@ -119,6 +126,11 @@ abstract public class EpeverField<T> {
         n.put("textValue", factory.textNode(toString()));
         n.put("value", factory.numberNode(doubleValue()));
         return n;
+    }
+
+    public EpeverField<T> withChargerConnection( SolarCharger.ConnectionOp op ) throws Exception {
+        this.solarCharger.withConnection(op);
+        return this;
     }
 
 }
