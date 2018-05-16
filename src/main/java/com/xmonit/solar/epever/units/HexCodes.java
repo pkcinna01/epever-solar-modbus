@@ -1,5 +1,6 @@
 package com.xmonit.solar.epever.units;
 
+import com.xmonit.solar.epever.EpeverException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.codehaus.jackson.node.ArrayNode;
@@ -10,6 +11,7 @@ import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class HexCodes extends Unit {
@@ -204,17 +206,29 @@ public class HexCodes extends Unit {
     }
 
 
-    public int findByName(String codeName ) throws Exception {
-        if ( bitRangeContextList.size() > 1 ) {
-            throw new Exception(this.name + " has multiple bit ranges defined.  The bit range name must also be specified (use findByBitRangeAndName)");
+    public int findById(Object id) throws EpeverException {
+        int code = Integer.parseInt(id.toString());
+        return findByFilter( code, (idAndName) -> idAndName.getKey().intValue() == code );
+    }
+
+    public int findByName(final String codeName ) throws EpeverException {
+
+        return findByFilter( codeName, (idAndName) -> idAndName.getValue().equalsIgnoreCase(codeName.trim()) );
+    }
+
+    public int findByFilter(Object key, Predicate<Pair<Integer,String>> filter ) throws EpeverException {
+        if ( key == null ) {
+            throw new EpeverException("Code lookup attempted with null key for '" + this.name + "'");
+        } else if ( bitRangeContextList.size() > 1 ) {
+            throw new EpeverException(this.name + " has multiple bit ranges defined.  The bit range name must also be specified (use findByBitRangeAndName)");
         }
         BitRangeContext brc = bitRangeContextList.get(0);
         for( Pair<Integer,String> pair : brc.flags) {
-            if ( pair.getValue().equalsIgnoreCase(codeName) ) {
+            if ( filter.test(pair) ) {
                 return pair.getKey();
             }
         }
-        throw new Exception("'"+codeName+"' not a valid choice.  " + getDescription());
+        throw new EpeverException("Invalid choice: " + key + ".  " + getDescription());
     }
 
 

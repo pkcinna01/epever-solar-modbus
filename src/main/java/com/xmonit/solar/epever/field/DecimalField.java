@@ -1,8 +1,10 @@
 package com.xmonit.solar.epever.field;
 
+import com.xmonit.solar.epever.EpeverParseException;
 import com.xmonit.solar.epever.units.Unit;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 
 public class DecimalField extends RegisterBackedField<BigDecimal> {
 
@@ -19,6 +21,15 @@ public class DecimalField extends RegisterBackedField<BigDecimal> {
     @Override
     public int[] toRegisters(BigDecimal val) {
        return RegisterConversions.fromBigDecimal(val, denominator);
+    }
+
+    @Override
+    public BigDecimal parseValue(String strVal) throws EpeverParseException {
+        try {
+            return new BigDecimal(strVal.replaceAll(",",""));
+        } catch ( NumberFormatException ex ) {
+            throw new EpeverParseException("Could not convert text to BigDecimal.", ex);
+        }
     }
 
     @Override

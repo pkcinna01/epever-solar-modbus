@@ -1,6 +1,7 @@
 package com.xmonit.solar.epever.field;
 
 import com.xmonit.solar.epever.EpeverException;
+import com.xmonit.solar.epever.EpeverParseException;
 import com.xmonit.solar.epever.units.Unit;
 
 import java.time.LocalDateTime;
@@ -28,6 +29,11 @@ public class BooleanList extends EpeverField<List<Boolean>> {
     @Override
     public int getCount() {
         return bitCount;
+    }
+
+    @Override
+    public List<Boolean> parseValue(String strVal) throws EpeverParseException {
+        throw new EpeverParseException("Boolean list parsing not yet supported.  Could not parse: " + strVal);
     }
 
     @Override

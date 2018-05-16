@@ -31,9 +31,13 @@ public class EpeverFieldList extends ArrayList<EpeverField> {
         });
     }
 
-    public static void readValues(SolarCharger solarCharger, List<EpeverField> fields)
+    public synchronized static void readValues(SolarCharger solarCharger, List<EpeverField> fields)
             throws EpeverException {
-        readValues(solarCharger,fields,20);
+        for( EpeverField field: fields) {
+            field.readValue();
+        }
+        //TBD - bulk reads cause some fields to get wrong values (load timer 2 start and end are always load timer 1 value)
+        //readValues(solarCharger,fields,20);
     }
 
     /**

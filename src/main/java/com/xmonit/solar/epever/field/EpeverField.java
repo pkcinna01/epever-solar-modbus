@@ -1,5 +1,6 @@
 package com.xmonit.solar.epever.field;
 
+import com.xmonit.solar.epever.EpeverParseException;
 import com.xmonit.solar.epever.SolarCharger;
 import com.xmonit.solar.epever.EpeverException;
 import com.xmonit.solar.epever.units.Unit;
@@ -52,6 +53,12 @@ abstract public class EpeverField<T> {
 
     abstract int getCount();
 
+    abstract public T parseValue(String strVal) throws EpeverParseException;
+
+    public void writeValue(String value) throws EpeverException {
+        T val = parseValue(value);
+        writeValue(val);
+    }
     /**
      * @return Double representation of getValue() used by monitoring systems
      */

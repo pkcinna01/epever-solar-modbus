@@ -1,5 +1,6 @@
 package com.xmonit.solar.epever.field;
 
+import com.xmonit.solar.epever.EpeverParseException;
 import com.xmonit.solar.epever.units.Unit;
 
 import java.text.ParseException;
@@ -11,6 +12,17 @@ D7-0 Hour, D15-8 Day
 D7-0 Month, D15-8 Year
 */
 public class DurationField extends RegisterBackedField<Duration> {
+
+
+    public static Duration parse(String strVal) throws EpeverParseException {
+        try {
+            TimeField.Parser tp = new TimeField.Parser(strVal.replaceFirst("\\s*[(].*$",""));
+            Duration duration = Duration.ofHours(tp.hours).plusMinutes(tp.minutes).plusSeconds(tp.seconds);
+            return duration;
+        } catch ( EpeverParseException ex ) {
+            throw new EpeverParseException("Could not convert text to a duration.",ex);
+        }
+    }
 
 
     public DurationField(int addr, String name, String description) {
@@ -30,16 +42,16 @@ public class DurationField extends RegisterBackedField<Duration> {
         return RegisterConversions.fromDuration(val,registerCount);
     }
 
+
     @Override
     public double doubleValue() {
         return value == null ? Double.NaN : (double) value.getSeconds();
     }
 
-    public static Duration parse(String strVal) throws ParseException {
-        TimeField.Parser tp = new TimeField.Parser(strVal);
-        Duration duration = Duration.ofHours(tp.hours).plusMinutes(tp.minutes).plusSeconds(tp.seconds);
-        return duration;
+
+    @Override
+    public Duration parseValue(String strVal) throws EpeverParseException {
+
+        return DurationField.parse(strVal);
     }
-
-
 }

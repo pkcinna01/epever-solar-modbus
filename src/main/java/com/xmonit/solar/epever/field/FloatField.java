@@ -1,5 +1,6 @@
 package com.xmonit.solar.epever.field;
 
+import com.xmonit.solar.epever.EpeverParseException;
 import com.xmonit.solar.epever.units.Unit;
 
 import java.math.BigDecimal;
@@ -20,6 +21,15 @@ public class FloatField extends RegisterBackedField<Float> {
     @Override
     public int[] toRegisters(Float val) {
         return RegisterConversions.fromBigDecimal( new BigDecimal(val), denominator);
+    }
+
+    @Override
+    public Float parseValue(String strVal) throws EpeverParseException {
+        try {
+            return Float.parseFloat(strVal);
+        } catch ( NumberFormatException ex ) {
+            throw new EpeverParseException("Could not convert text to float.", ex);
+        }
     }
 
     @Override

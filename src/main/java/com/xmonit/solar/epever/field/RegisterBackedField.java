@@ -4,6 +4,7 @@ import com.xmonit.solar.epever.EpeverException;
 import com.xmonit.solar.epever.units.Unit;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Map;
 
 
@@ -88,7 +89,15 @@ public abstract class RegisterBackedField<T> extends EpeverField<T> {
 
     @Override
     public void writeValue(T val) throws EpeverException {
-        solarCharger.writeRegisters(addr,toRegisters(val));
+        int[] registers = toRegisters(val);
+        if ( registers.length > getCount() ) {
+            throw new EpeverException("Conversion to modbus register(s) failed. Field has " + getCount()
+            + " registers assigned but value encoding used " + registers.length + ". Value: " + val);
+        } else if ( registers.length != getCount() ) {
+            registers = Arrays.copyOf(registers,getCount());
+        }
+
+        solarCharger.writeRegisters(addr,registers);
         this.value = val;
         this.commitTime = LocalDateTime.now();
     }

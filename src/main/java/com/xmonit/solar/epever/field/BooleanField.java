@@ -1,5 +1,6 @@
 package com.xmonit.solar.epever.field;
 
+import com.xmonit.solar.epever.EpeverParseException;
 import com.xmonit.solar.epever.SolarCharger;
 import com.xmonit.solar.epever.EpeverException;
 import com.xmonit.solar.epever.units.Unit;
@@ -30,6 +31,11 @@ public class BooleanField extends EpeverField<Boolean> {
     @Override
     public int getCount() {
         return impl.getCount();
+    }
+
+    @Override
+    public Boolean parseValue(String strVal) throws EpeverParseException {
+        return Boolean.valueOf(strVal);
     }
 
     @Override

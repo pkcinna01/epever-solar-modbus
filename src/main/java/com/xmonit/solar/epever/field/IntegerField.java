@@ -1,5 +1,6 @@
 package com.xmonit.solar.epever.field;
 
+import com.xmonit.solar.epever.EpeverParseException;
 import com.xmonit.solar.epever.units.Unit;
 
 import java.math.BigInteger;
@@ -19,6 +20,15 @@ public class IntegerField extends RegisterBackedField<BigInteger> {
     @Override
     public int[] toRegisters(BigInteger val) {
         return RegisterConversions.fromBigInteger(val, denominator);
+    }
+
+    @Override
+    public BigInteger parseValue(String strVal) throws EpeverParseException {
+        try {
+            return new BigInteger(strVal.replaceAll(",",""));
+        } catch ( NumberFormatException ex ) {
+            throw new EpeverParseException("Could not convert text to float.", ex);
+        }
     }
 
     @Override

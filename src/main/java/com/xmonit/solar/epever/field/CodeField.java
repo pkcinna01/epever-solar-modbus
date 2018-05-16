@@ -1,5 +1,7 @@
 package com.xmonit.solar.epever.field;
 
+import com.xmonit.solar.epever.EpeverException;
+import com.xmonit.solar.epever.EpeverParseException;
 import com.xmonit.solar.epever.units.HexCodes;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
@@ -55,9 +57,14 @@ public class CodeField extends RegisterBackedField<BigInteger> {
     }
 
     // this only makes sense if field has only one bit range
-    public void writeValue(String codeName) throws Exception {
+    @Override
+    public BigInteger parseValue(String codeName) throws EpeverParseException {
         HexCodes codes = (HexCodes) unit;
-        int code = codes.findByName(codeName);
-        writeValue(BigInteger.valueOf(code));
+        try {
+            int code = codeName.matches("^\\d+$") ? codes.findById(codeName) : codes.findByName(codeName);
+            return BigInteger.valueOf(code);
+        } catch ( Exception ex ) {
+            throw new EpeverParseException("Could not convert text value into numeric code.", ex);
+        }
     }
 }
