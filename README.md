@@ -6,13 +6,10 @@ Library (java jar) supporting communication with EPever solar charge controllers
 
 It uses [jlibmodbus](https://github.com/kochedykov/jlibmodbus) to send epever specific messages.
 
-### TODO: Have not tested some write operations like CodesField.writeValue
-
-
 ## Motivation
 
-Need a pure Java approach to managing EPever charge controllers.  The intent is to have
-a Java web application and misc utilities that do not depend on scripts, gotracer (go), or epsolar-tracer (python).
+Needed a pure Java approach to managing EPever charge controllers.  It supports 
+a Java web application.
 
 ## Installation
 
