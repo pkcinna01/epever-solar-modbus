@@ -20,6 +20,9 @@ abstract public class SolarCharger {
         public String model;
         public String version;
         public String commPort;
+        public String getId() {
+            return getModel() + "|" + getCommPort();
+        }
     }
 
     public static String hex(int i) {
@@ -37,6 +40,8 @@ abstract public class SolarCharger {
     abstract public void connect() throws ModbusIOException;
 
     abstract public void disconnect() throws ModbusIOException;
+
+    abstract public boolean isConnected() throws ModbusIOException;
 
     abstract public DeviceInfo readDeviceInfo() throws EpeverException;
 
@@ -61,9 +66,11 @@ abstract public class SolarCharger {
         this.init(deviceName,MIN_SERVER_ADDRESS);
     };
 
-    public DeviceInfo getDeviceInfo() throws EpeverException {
-        if ( deviceInfo == null ) {
+    public synchronized DeviceInfo getDeviceInfo() {
+        if ( deviceInfo == null ) try {
             deviceInfo = readDeviceInfo();
+        } catch (EpeverException ex) {
+            throw new RuntimeException(ex);
         }
         return deviceInfo;
     }
@@ -73,14 +80,18 @@ abstract public class SolarCharger {
     }
 
     public synchronized SolarCharger withConnection( ConnectionOp op ) throws Exception {
+        boolean priorConnection = this.isConnected();
         try {
-            this.connect();
+            if ( !priorConnection ) {
+                this.connect();
+            }
             try {
                 op.run();
             } catch (Exception ex) {
                 throw ex;
             }
         } finally {
+            if ( !priorConnection )
             this.disconnect();
         }
         return this;
@@ -88,5 +99,11 @@ abstract public class SolarCharger {
 
     public String getSerialName() {
         return serialName;
+    }
+
+    public String getId() {
+        DeviceInfo di = getDeviceInfo();
+
+        return di.getId();
     }
 }

@@ -37,7 +37,7 @@ public class EpeverFieldListTest extends SolarChargerDependentTest {
         int[] maxGaps = { 1, 1, 1, 3, 3, 3, 5, 5, 5, 20, 20, 20 };
         for ( int maxGap : maxGaps ) {
             long start = System.nanoTime();
-            EpeverFieldList.readValues(solarCharger,fieldList, maxGap);
+            fieldList.readValues(maxGap);
             String msg = "Max gap: " + maxGap + " us: " + (System.nanoTime()-start)/1000;
             msgs.add(msg);
         }

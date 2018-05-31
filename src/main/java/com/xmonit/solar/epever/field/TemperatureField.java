@@ -7,8 +7,10 @@ public class TemperatureField extends FloatField {
 
 
     public TemperatureField(int addr, String name, String description) {
-        this(addr, Unit.Celcius, name, description);
+        this(addr, Unit.Fahrenheit, name, description);
     }
+
+
     public TemperatureField(int addr, Unit unit, String name, String description) {
         super(addr, unit, name, description, 100, 1);
     }

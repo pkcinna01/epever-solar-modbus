@@ -5,7 +5,7 @@ import org.junit.Before;
 
 public abstract class SolarChargerDependentTest {
 
-  public SolarCharger solarCharger = new EpeverSolarCharger();
+  public EpeverSolarCharger solarCharger = new EpeverSolarCharger();
   //public SolarCharger solarCharger = new MockSolarCharger();
 
   @Before

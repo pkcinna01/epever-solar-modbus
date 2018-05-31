@@ -24,7 +24,7 @@ public abstract class Time extends Unit {
 
         @Override
         public String asString(Object val) {
-            return val.toString();
+            return val == null ? null : val.toString();
         }
     }
 

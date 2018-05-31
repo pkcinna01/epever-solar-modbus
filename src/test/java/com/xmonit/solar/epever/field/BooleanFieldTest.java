@@ -11,7 +11,7 @@ public class BooleanFieldTest extends SolarChargerDependentTest {
     @Test
     public void readCoilsAndDiscreteInputBackedFields() throws Exception {
         EpeverFieldList epeverFieldList = EpeverFieldList.createBooleanBackedFields(solarCharger);
-        for (EpeverField field : epeverFieldList) {
+        for (EpeverField field : epeverFieldList.getListImpl()) {
            BooleanField booleanField = (BooleanField)field;
             System.out.println(booleanField.name);
             Boolean val = booleanField.readValue();

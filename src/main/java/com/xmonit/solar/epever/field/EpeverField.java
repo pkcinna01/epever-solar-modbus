@@ -82,7 +82,6 @@ abstract public class EpeverField<T> {
     public boolean isDiscreteInputBacked() { return EpeverField.isDiscreteInputBacked(addr); }
     public boolean isInputRegisterBacked() { return EpeverField.isInputRegisterBacked(addr); }
     public boolean isHoldingRegisterBacked() { return EpeverField.isHoldingRegisterBacked(addr); }
-    public boolean isMetric() { return EpeverField.isMetric(addr); }
     public boolean isRating() { return EpeverField.isRating(addr); }
     public boolean isRegisterBacked() { return isInputRegisterBacked() || isHoldingRegisterBacked(); }
 

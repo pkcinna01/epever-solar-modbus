@@ -7,6 +7,8 @@ import com.intelligt.modbus.jlibmodbus.master.ModbusMasterFactory;
 import com.intelligt.modbus.jlibmodbus.msg.base.mei.MEIReadDeviceIdentification;
 import com.intelligt.modbus.jlibmodbus.msg.base.mei.ReadDeviceIdentificationCode;
 import com.intelligt.modbus.jlibmodbus.serial.*;
+import com.xmonit.solar.epever.field.EpeverField;
+import com.xmonit.solar.epever.field.EpeverFieldList;
 
 //import purejavacomm.CommPortIdentifier;
 //import jssc.SerialPortList;
@@ -15,6 +17,7 @@ import com.intelligt.modbus.jlibmodbus.serial.*;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -75,21 +78,26 @@ public class EpeverSolarCharger extends SolarCharger {
 
 
     @Override
-    public void connect() throws ModbusIOException {
+    public synchronized void connect() throws ModbusIOException {
         modbusMaster.connect();
 
     }
 
 
     @Override
-    public void disconnect() throws ModbusIOException {
+    public synchronized void disconnect() throws ModbusIOException {
         modbusMaster.disconnect();
 
     }
 
+    @Override
+    public boolean isConnected() throws ModbusIOException {
+        return modbusMaster.isConnected();
+    }
+
 
     @Override
-    public DeviceInfo readDeviceInfo() throws EpeverException {
+    public synchronized DeviceInfo readDeviceInfo() throws EpeverException {
 
         try {
             DeviceInfo deviceInfo = new DeviceInfo();
@@ -107,7 +115,7 @@ public class EpeverSolarCharger extends SolarCharger {
 
 
     @Override
-    public int[] readInputRegisters(int addr, int registerCount) throws EpeverException {
+    public synchronized int[] readInputRegisters(int addr, int registerCount) throws EpeverException {
 
         try {
             return modbusMaster.readInputRegisters(serverAddressId, addr, registerCount);
@@ -118,7 +126,7 @@ public class EpeverSolarCharger extends SolarCharger {
 
 
     @Override
-    public int[] readHoldingRegisters(int addr, int registerCount) throws EpeverException {
+    public synchronized int[] readHoldingRegisters(int addr, int registerCount) throws EpeverException {
 
         try {
             return modbusMaster.readHoldingRegisters(serverAddressId, addr, registerCount);
@@ -129,7 +137,7 @@ public class EpeverSolarCharger extends SolarCharger {
 
 
     @Override
-    public boolean[] readDiscreteInputs(int addr, int inputCount) throws EpeverException {
+    public synchronized boolean[] readDiscreteInputs(int addr, int inputCount) throws EpeverException {
         try {
             return modbusMaster.readDiscreteInputs(serverAddressId, addr, inputCount);
         } catch (Exception ex) {
@@ -139,7 +147,7 @@ public class EpeverSolarCharger extends SolarCharger {
 
 
     @Override
-    public boolean[] readCoils(int addr, int coilCount) throws EpeverException {
+    public synchronized boolean[] readCoils(int addr, int coilCount) throws EpeverException {
 
         try {
             return modbusMaster.readCoils(serverAddressId, addr, coilCount);
@@ -150,7 +158,7 @@ public class EpeverSolarCharger extends SolarCharger {
 
 
     @Override
-    public void writeRegisters(int addr, int[] registers) throws EpeverException {
+    public synchronized void writeRegisters(int addr, int[] registers) throws EpeverException {
 
         try {
             modbusMaster.writeMultipleRegisters(serverAddressId, addr, registers);
@@ -161,7 +169,7 @@ public class EpeverSolarCharger extends SolarCharger {
 
 
     @Override
-    public void writeCoils(int addr, boolean[] coils) throws EpeverException {
+    public synchronized void writeCoils(int addr, boolean[] coils) throws EpeverException {
 
         try {
             modbusMaster.writeMultipleCoils(serverAddressId, addr, coils);

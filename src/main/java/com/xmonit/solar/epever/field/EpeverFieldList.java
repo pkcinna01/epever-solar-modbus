@@ -1,50 +1,45 @@
 package com.xmonit.solar.epever.field;
 
 
+import com.xmonit.solar.epever.EpeverSolarCharger;
 import com.xmonit.solar.epever.SolarCharger;
 import com.xmonit.solar.epever.EpeverException;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
-public class EpeverFieldList extends ArrayList<EpeverField> {
+public class EpeverFieldList implements Iterable<EpeverField> {
 
-    public static EpeverFieldList masterFieldList = new EpeverFieldList(null);
+    public static EpeverFieldList masterFieldList = new EpeverFieldList(null).addFromDefs(f->true);
 
-    public static EpeverFieldList createInputRegisterBackedFields(SolarCharger cc) {
-        return new EpeverFieldList(cc, (fieldDef) -> {
-            return EpeverField.isInputRegisterBacked(fieldDef.registerAddress);
-        });
+
+    public static EpeverFieldList createInputRegisterBackedFields(EpeverSolarCharger cc) {
+        return new EpeverFieldList(cc).addFromDefs( fieldDef -> EpeverField.isInputRegisterBacked(fieldDef.registerAddress));
     }
 
-    public static EpeverFieldList createHoldingRegisterBackedFields(SolarCharger cc) {
-        return new EpeverFieldList(cc, (fieldDef) -> {
-            return EpeverField.isHoldingRegisterBacked(fieldDef.registerAddress);
-        });
+
+    public static EpeverFieldList createHoldingRegisterBackedFields(EpeverSolarCharger cc) {
+        return new EpeverFieldList(cc).addFromDefs( fieldDef -> EpeverField.isHoldingRegisterBacked(fieldDef.registerAddress));
     }
 
-    public static EpeverFieldList createBooleanBackedFields(SolarCharger cc) {
-        return new EpeverFieldList(cc, (fieldDef) -> {
-            return EpeverField.isBooleanBacked(fieldDef.registerAddress); // coils and discrete inputs
-        });
+
+    public static EpeverFieldList createBooleanBackedFields(EpeverSolarCharger cc) {
+        return new EpeverFieldList(cc).addFromDefs( fieldDef -> EpeverField.isBooleanBacked(fieldDef.registerAddress));
     }
 
-    public synchronized static void readValues(SolarCharger solarCharger, List<EpeverField> fields)
-            throws EpeverException {
-        for( EpeverField field: fields) {
-            field.readValue();
-        }
-        //TBD - bulk reads cause some fields to get wrong values (load timer 2 start and end are always load timer 1 value)
-        //readValues(solarCharger,fields,20);
-    }
 
     /**
      * Group field addresses to minimize requests to charge controller.  Initial testing
      * suggests 45% faster if using max address gap of 20.  There is not a
      * big difference between 5 and 20 since there are lots of mandatory areas
      * that have to be skipped (see if statement below with ranges).
+     *
+     * TBD - Issue with some fields getting wrong register.  Appears to be hardware specific
      *
      * @param solarCharger
      * @param fields
@@ -111,47 +106,111 @@ public class EpeverFieldList extends ArrayList<EpeverField> {
                 }
             }
         }
-        //System.out.print(""+maxAddressGap+": ");
-        //groupedFields.forEach( g -> System.out.print("" + g.size() + ", " ));
-        //System.out.println();
     }
 
-    SolarCharger solarCharger;
 
-    public EpeverFieldList(SolarCharger cc) {
-        this(cc, (fieldDef) -> {
-            return true;
-        });
+    EpeverSolarCharger solarCharger;
+    List<EpeverField> listImpl;
+
+
+    public EpeverFieldList(EpeverSolarCharger cc) {
+        this( cc, new ArrayList() );
     }
 
-    public EpeverFieldList(SolarCharger cc, Predicate<EpeverFieldDefinitions> filter) {
+
+    public EpeverFieldList(EpeverSolarCharger cc, List<EpeverField> list) {
         solarCharger = cc;
+        listImpl = list;
+    }
+
+
+    public EpeverFieldList addFromDefs(Predicate<EpeverFieldDefinitions> filter) {
         for (EpeverFieldDefinitions def : EpeverFieldDefinitions.values()) {
             if (filter.test(def)) {
-                add(def.create(solarCharger));
+                listImpl.add(def.create(solarCharger));
             }
+        }
+        return this;
+    }
+
+
+    public EpeverFieldList addFromMaster(Predicate<EpeverField> filter) {
+        masterFieldList.stream().filter(filter)
+                .map( f-> EpeverField.createByAddr(solarCharger,f.addr) ).forEach(listImpl::add);
+        return this;
+    }
+
+
+    public List<EpeverField> getListImpl() {
+        return listImpl;
+    }
+
+
+    public synchronized void connectAndReadValues() throws Exception {
+        solarCharger.withConnection( () -> readValues() );
+    }
+
+
+    public synchronized void readValues() throws EpeverException {
+        for( EpeverField field: listImpl) {
+            field.readValue();
         }
     }
 
-    public synchronized void readValues() throws EpeverException {
-        EpeverFieldList.readValues(solarCharger, this, 20);
+
+    public synchronized void readValues(int maxGap) throws EpeverException {
+        EpeverFieldList.readValues(solarCharger,getListImpl(),maxGap);
     }
+
 
     public EpeverFieldList setSolarCharger(final SolarCharger cc) {
-        this.forEach( field ->  field.setSolarCharger(cc) );
+        listImpl.forEach( field ->  field.setSolarCharger(cc) );
         return this;
     }
+
+    public EpeverSolarCharger getSolarCharger() {
+        return solarCharger;
+    }
+
 
     public synchronized EpeverFieldList reset() {
-        this.forEach( field ->  field.reset() );
+        listImpl.forEach( field ->  field.reset() );
         return this;
     }
 
-    public synchronized void updateValues(List<EpeverField> srcFields) {
-        for( EpeverField field: this ) {
+
+    public void copyValuesFrom(EpeverFieldList srcFields) {
+        copyValuesFrom(srcFields.getListImpl());
+    }
+
+    public synchronized void copyValuesFrom(List<EpeverField> srcFields) {
+        for( EpeverField field: listImpl ) {
             srcFields.stream().filter(srcField->srcField.addr == field.addr).findFirst().ifPresent(srcField->
                field.value = srcField.value
             );
         }
+    }
+
+    public EpeverField get(int index) { return listImpl.get(index); }
+
+    public boolean isEmpty() {
+        return listImpl.isEmpty();
+    }
+
+    public int size() {
+        return listImpl.size();
+    }
+
+    public Stream<EpeverField> stream() {
+        return listImpl.stream();
+    }
+
+    public Stream<EpeverField> filter(Predicate<EpeverField> fieldFilter) {
+        return stream().filter(fieldFilter);
+    }
+
+    @Override
+    public Iterator<EpeverField> iterator() {
+        return listImpl.iterator();
     }
 }

@@ -8,14 +8,21 @@ import java.util.List;
 public class MockSolarCharger extends SolarCharger {
 
 
+    boolean connected = false;
+
     @Override
     public void connect() throws ModbusIOException {
-
+        connected = true;
     }
 
     @Override
     public void disconnect() throws ModbusIOException {
+        connected = false;
+    }
 
+    @Override
+    public boolean isConnected() throws ModbusIOException {
+        return connected;
     }
 
     @Override
