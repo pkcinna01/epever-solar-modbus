@@ -23,14 +23,14 @@ public enum EpeverFieldDefinitions {
 
     INPUT_VOLTAGE( 0x3100, (cc, addr) -> new VoltageField(addr, "Input Voltage", "PV array terminal present input voltage")),
     INPUT_CURRENT( 0x3101, (cc, addr) -> new CurrentField(addr, "Input Current", "PV array terminal present input current")),
-    INPUT_POWER( 0x3102, (cc, addr) -> new PowerField(addr, "Input Power", "PV array terminal present input power")),
+    INPUT_POWER( 0x3102, (cc, addr) -> new PowerField(addr, "Input Power", "PV array terminal present input power").setCount(2)),
     OUTPUT_VOLTAGE( 0x3104, (cc, addr) -> new VoltageField(addr, "Output Voltage", "Battery terminal present output voltage")),
     OUTPUT_CURRENT( 0x3105, (cc, addr) -> new CurrentField(addr, "Output Current", "Battery terminal present output current")),
-    OUTPUT_POWER( 0x3106, (cc, addr) -> new PowerField(addr, "Output Power", "Battery terminal present output power")),
+    OUTPUT_POWER( 0x3106, (cc, addr) -> new PowerField(addr, "Output Power", "Battery terminal present output power").setCount(2)),
 
     OUTPUT_LOAD_VOLTAGE( 0x310C, (cc, addr) -> new VoltageField(addr, "Output Load Voltage", "Load terminal present output voltage")),
     OUTPUT_LOAD_CURRENT( 0x310D, (cc, addr) -> new CurrentField(addr, "Output Load Current", "Load terminal present output current")),
-    OUTPUT_LOAD_POWER( 0x310E, (cc, addr) -> new PowerField(addr, "Output Load Power", "Load terminal present output power").setCount(1)),
+    OUTPUT_LOAD_POWER( 0x310E, (cc, addr) -> new PowerField(addr, "Output Load Power", "Load terminal present output power").setCount(2)),
     BATTERY_TEMPERATURE( 0x3110, (cc, addr) -> new TemperatureField(addr, "Battery Temperature", "Battery temperature")),
     TEMPERATURE( 0x3111, (cc, addr) -> new TemperatureField(addr, "Internal Temperature", "Internal device temperature")),
     SURFACE_TEMPERATURE( 0x3112, (cc, addr) -> new TemperatureField(addr, "External Temperature", "External device temperature (heat sink surface)")),
