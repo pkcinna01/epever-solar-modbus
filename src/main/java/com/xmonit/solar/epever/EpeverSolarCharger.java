@@ -72,7 +72,7 @@ public class EpeverSolarCharger extends SolarCharger {
         serialParameters.setParity(SerialPort.Parity.NONE);
         serialParameters.setStopBits(1);
         modbusMaster = ModbusMasterFactory.createModbusMasterRTU(serialParameters);
-        modbusMaster.setResponseTimeout(10000);
+        modbusMaster.setResponseTimeout(15000);
 
     }
 
