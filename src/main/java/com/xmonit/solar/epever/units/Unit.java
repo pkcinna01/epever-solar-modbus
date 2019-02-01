@@ -1,7 +1,8 @@
 package com.xmonit.solar.epever.units;
 
-import org.codehaus.jackson.node.JsonNodeFactory;
-import org.codehaus.jackson.node.ObjectNode;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.time.Duration;
 
@@ -57,9 +58,9 @@ public class Unit {
     public ObjectNode asJson(){
         JsonNodeFactory factory = JsonNodeFactory.instance;
         ObjectNode n = factory.objectNode();
-        n.put("name",factory.textNode(name));
-        n.put("abbr",factory.textNode(abbr));
-        n.put("description", factory.textNode(getDescription()));
+        n.set("name",factory.textNode(name));
+        n.set("abbr",factory.textNode(abbr));
+        n.set("description", factory.textNode(getDescription()));
         return n;
     }
 

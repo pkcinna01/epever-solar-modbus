@@ -1,10 +1,9 @@
 package com.xmonit.solar.epever.field;
 
-import com.xmonit.solar.epever.EpeverException;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xmonit.solar.epever.EpeverParseException;
 import com.xmonit.solar.epever.units.HexCodes;
-import org.codehaus.jackson.node.JsonNodeFactory;
-import org.codehaus.jackson.node.ObjectNode;
 
 import java.math.BigInteger;
 
@@ -25,7 +24,7 @@ public class CodeField extends RegisterBackedField<BigInteger> {
         JsonNodeFactory factory = JsonNodeFactory.instance;
         ObjectNode n = super.asJson();
         HexCodes hexCodes = (HexCodes) unit;
-        n.put("values",hexCodes.asJson(getValue()));
+        n.set("values",hexCodes.asJson(getValue()));
         return n;
     }
 
@@ -52,7 +51,7 @@ public class CodeField extends RegisterBackedField<BigInteger> {
 
     public ObjectNode valueAsJson(){
         ObjectNode n = super.valueAsJson();
-        n.put("values",((HexCodes)unit).asJson(getValue()));
+        n.set("values",((HexCodes)unit).asJson(getValue()));
         return n;
     }
 

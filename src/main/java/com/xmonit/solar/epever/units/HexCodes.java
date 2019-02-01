@@ -1,11 +1,11 @@
 package com.xmonit.solar.epever.units;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xmonit.solar.epever.EpeverException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.node.JsonNodeFactory;
-import org.codehaus.jackson.node.ObjectNode;
 
 import java.math.BigInteger;
 import java.util.LinkedList;
@@ -27,15 +27,15 @@ public class HexCodes extends Unit {
 
         public ObjectNode asJson(){
             ObjectNode n = factory.objectNode();
-            n.put("name", factory.textNode(name));
+            n.set("name", factory.textNode(name));
             ArrayNode choicesNode = factory.arrayNode();
             for( Pair<Integer,String> flag : flags ){
                 ObjectNode choiceNode = factory.objectNode();
-                choiceNode.put("value",factory.numberNode(flag.getKey()));
-                choiceNode.put("text",factory.textNode(flag.getValue()));
+                choiceNode.set("value",factory.numberNode(flag.getKey()));
+                choiceNode.set("text",factory.textNode(flag.getValue()));
                 choicesNode.add(choiceNode);
             }
-            n.put("choices", choicesNode);
+            n.set("choices", choicesNode);
             return n;
         }
 
@@ -65,9 +65,9 @@ public class HexCodes extends Unit {
             String getTextValue() { return valueToString(this.value);}
             ObjectNode asJson() {
                 ObjectNode n = factory.objectNode();
-                n.put("name",factory.textNode(getName()));
-                n.put("value",factory.numberNode(value));
-                n.put("text",factory.textNode(getTextValue()));
+                n.set("name",factory.textNode(getName()));
+                n.set("value",factory.numberNode(value));
+                n.set("text",factory.textNode(getTextValue()));
                 return n;
             }
         }
@@ -146,7 +146,7 @@ public class HexCodes extends Unit {
         for(BitRangeContext brc: bitRangeContextList) {
             bitRanges.add(brc.asJson());
         }
-        n.put("bitRanges", bitRanges);
+        n.set("bitRanges", bitRanges);
         return n;
     }
 

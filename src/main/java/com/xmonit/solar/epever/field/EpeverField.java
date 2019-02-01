@@ -1,13 +1,13 @@
 package com.xmonit.solar.epever.field;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.xmonit.solar.epever.EpeverException;
 import com.xmonit.solar.epever.EpeverParseException;
 import com.xmonit.solar.epever.SolarCharger;
-import com.xmonit.solar.epever.EpeverException;
 import com.xmonit.solar.epever.units.Unit;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.node.JsonNodeFactory;
-import org.codehaus.jackson.node.ObjectNode;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -67,12 +67,12 @@ abstract public class EpeverField<T> {
 
     public ObjectNode asJson(){
         ObjectNode n = factory.objectNode();
-        n.put("name",factory.textNode(name));
-        n.put("addr",factory.numberNode(addr));
-        n.put("textValue", factory.textNode(toString()));
-        n.put("value", factory.numberNode(doubleValue()));
-        n.put("description", factory.textNode(getDescription()));
-        n.put("unit", unit.asJson());
+        n.set("name",factory.textNode(name));
+        n.set("addr",factory.numberNode(addr));
+        n.set("textValue", factory.textNode(toString()));
+        n.set("value", factory.numberNode(doubleValue()));
+        n.set("description", factory.textNode(getDescription()));
+        n.set("unit", unit.asJson());
         return n;
     }
 
@@ -126,10 +126,10 @@ abstract public class EpeverField<T> {
 
     public ObjectNode valueAsJson(){
         ObjectNode n = factory.objectNode();
-        n.put("name",factory.textNode(name));
-        n.put("addr",factory.numberNode(addr));
-        n.put("textValue", factory.textNode(toString()));
-        n.put("value", factory.numberNode(doubleValue()));
+        n.set("name",factory.textNode(name));
+        n.set("addr",factory.numberNode(addr));
+        n.set("textValue", factory.textNode(toString()));
+        n.set("value", factory.numberNode(doubleValue()));
         return n;
     }
 
