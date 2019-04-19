@@ -7,19 +7,15 @@ import com.intelligt.modbus.jlibmodbus.master.ModbusMasterFactory;
 import com.intelligt.modbus.jlibmodbus.msg.base.mei.MEIReadDeviceIdentification;
 import com.intelligt.modbus.jlibmodbus.msg.base.mei.ReadDeviceIdentificationCode;
 import com.intelligt.modbus.jlibmodbus.serial.*;
-import com.xmonit.solar.epever.field.EpeverField;
-import com.xmonit.solar.epever.field.EpeverFieldList;
-
-//import purejavacomm.CommPortIdentifier;
-//import jssc.SerialPortList;
-//import com.fazecast.jSerialComm.SerialPort;
 
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+//import jssc.SerialPortList;
+//import com.fazecast.jSerialComm.SerialPort;
 
 
 public class EpeverSolarCharger extends SolarCharger {
@@ -27,18 +23,18 @@ public class EpeverSolarCharger extends SolarCharger {
     static Function<Pattern,List<String>> findSerialPortNamesImpl;
 
     static {
-        SerialUtils.setSerialPortFactory( new SerialPortFactoryJSerialComm());
-        findSerialPortNamesImpl = (pattern) -> Arrays.stream(com.fazecast.jSerialComm.SerialPort.getCommPorts())
-                .map(port->port.getSystemPortName()).filter(n->pattern.matcher(n).matches()).collect(Collectors.toList());
+        //SerialUtils.setSerialPortFactory( new SerialPortFactoryJSerialComm());
+        //findSerialPortNamesImpl = (pattern) -> Arrays.stream(com.fazecast.jSerialComm.SerialPort.getCommPorts())
+        //        .map(port->port.getSystemPortName()).filter(n->pattern.matcher(n).matches()).collect(Collectors.toList());
 
         //SerialUtils.setSerialPortFactory(new SerialPortFactoryJSSC());
         //findSerialPortNamesImpl = (pattern) -> Stream.of(jssc.SerialPortList.getPortNames())
         //      .filter(name->pattern.matcher(name).matches()).collect(Collectors.toList());
 
-        //SerialUtils.setSerialPortFactory(new SerialPortFactoryPJC());
-        //findSerialPortNamesImpl = (pattern) -> Collections.list(purejavacomm.CommPortIdentifier.getPortIdentifiers()).stream()
-        //      .filter(id->id.getPortType() == purejavacomm.CommPortIdentifier.PORT_SERIAL).map(id->id.getName())
-        //      .filter(n->pattern.matcher(n).matches()).collect(Collectors.toList());
+        SerialUtils.setSerialPortFactory(new SerialPortFactoryPJC());
+        findSerialPortNamesImpl = (pattern) -> Collections.list(purejavacomm.CommPortIdentifier.getPortIdentifiers()).stream()
+              .filter(id->id.getPortType() == purejavacomm.CommPortIdentifier.PORT_SERIAL).map(id->id.getName())
+              .filter(n->pattern.matcher(n).matches()).collect(Collectors.toList());
 
         //SerialUtils.setSerialPortFactory(new SerialPortFactoryRXTX());
         //SerialUtils.setSerialPortFactory(new SerialPortFactoryJavaComm());
@@ -72,15 +68,14 @@ public class EpeverSolarCharger extends SolarCharger {
         serialParameters.setParity(SerialPort.Parity.NONE);
         serialParameters.setStopBits(1);
         modbusMaster = ModbusMasterFactory.createModbusMasterRTU(serialParameters);
-        modbusMaster.setResponseTimeout(15000);
-
+        modbusMaster.setResponseTimeout(15000); //Modbus.MAX_RESPONSE_TIMEOUT);
     }
 
 
     @Override
     public synchronized void connect() throws ModbusIOException {
         modbusMaster.connect();
-
+        //modbusMaster.setResponseTimeout(15000);
     }
 
 
