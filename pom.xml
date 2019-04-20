@@ -4,14 +4,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.xmonit.solar</groupId>
+        <artifactId>solar</artifactId>
+    </parent>
+
+
     <groupId>com.xmonit.solar</groupId>
     <artifactId>epever-solar-modbus</artifactId>
-    <!--version>1.1-SNAPSHOT</version-->
-    <version>1.1-RELEASE</version>
+    <version>${revision}</version>
+
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <revision>1.2.1-RELEASE</revision>
     </properties>
 
     <!--
