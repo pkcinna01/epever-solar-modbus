@@ -7,18 +7,17 @@
     <parent>
         <groupId>com.xmonit.solar</groupId>
         <artifactId>solar</artifactId>
+        <version>${revision}</version>
     </parent>
 
 
     <groupId>com.xmonit.solar</groupId>
     <artifactId>epever-solar-modbus</artifactId>
-    <version>${revision}</version>
 
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <revision>1.2.1-RELEASE</revision>
     </properties>
 
     <!--
