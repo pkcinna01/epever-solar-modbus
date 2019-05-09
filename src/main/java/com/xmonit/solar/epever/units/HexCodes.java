@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xmonit.solar.epever.EpeverException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigInteger;
 import java.util.LinkedList;
@@ -18,21 +17,26 @@ public class HexCodes extends Unit {
 
     JsonNodeFactory factory = JsonNodeFactory.instance;
 
+    /**
+     * Epever packs numeric fields into single modbus value.
+     * 1) This class associates a name for a group of bits and a way to extract the value.
+     * 2) A named range of bits may also have names for specific values such as embedded codes
+     */
     class BitRangeContext {
-        class Flags extends LinkedList<Pair<Integer,String>>{}
+        class Flags extends LinkedList<BitRangeCode>{}
 
         String name = "";
         int start = 0, end = 15;
-        Flags flags = new Flags();
+        Flags codes = new Flags();
 
         public ObjectNode asJson(){
             ObjectNode n = factory.objectNode();
             n.set("name", factory.textNode(name));
             ArrayNode choicesNode = factory.arrayNode();
-            for( Pair<Integer,String> flag : flags ){
+            for( BitRangeCode flag : codes){
                 ObjectNode choiceNode = factory.objectNode();
-                choiceNode.set("value",factory.numberNode(flag.getKey()));
-                choiceNode.set("text",factory.textNode(flag.getValue()));
+                choiceNode.set("value",factory.numberNode(flag.value));
+                choiceNode.set("text",factory.textNode(flag.name));
                 choicesNode.add(choiceNode);
             }
             n.set("choices", choicesNode);
@@ -40,9 +44,9 @@ public class HexCodes extends Unit {
         }
 
         public String valueToString(int val) {
-            for ( Pair<Integer,String> flag : flags ) {
-                if ( flag.getKey().equals(val) ) {
-                    return flag.getValue();
+            for ( BitRangeCode flag : codes) {
+                if ( flag.value.equals(val) ) {
+                    return flag.name;
                 }
             }
             return "Undefined Code";
@@ -56,26 +60,56 @@ public class HexCodes extends Unit {
             return bigEndianInt.shiftRight(start).and( mask );
         }
 
-        class Value {
-            int value;
-            Value(int value){
-                this.value = value;
-            }
-            String getName() { return BitRangeContext.this.name; }
-            String getTextValue() { return valueToString(this.value);}
-            ObjectNode asJson() {
-                ObjectNode n = factory.objectNode();
-                n.set("name",factory.textNode(getName()));
-                n.set("value",factory.numberNode(value));
-                n.set("text",factory.textNode(getTextValue()));
-                return n;
-            }
-        }
-
-        Value getValue(BigInteger bigEndianInt){
+        BitRangeCodes getValue(BigInteger bigEndianInt){
             BigInteger v = getCodeValue(bigEndianInt);
             int intVal = v != null ? v.intValue() : -1;
-            return new Value(intVal);
+            return new BitRangeCodes(this,intVal);
+        }
+    }
+
+    // A single flag/bit or code stored within a bit range
+    class BitRangeCode {
+
+        String name;
+        Integer value;
+
+        BitRangeCode(String name, Integer value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Integer getValue() {
+            return value;
+        }
+    }
+
+    class BitRangeCodes {
+
+        //packed flags/codes
+        int value;
+
+        BitRangeContext context;
+
+        BitRangeCodes(BitRangeContext context, int value){
+            this.context = context;
+            this.value = value;
+        }
+
+        String getName() { return context.name; }
+
+        // Unpack as individual flags/codes
+        String getTextValue() { return context.valueToString(this.value);}
+
+        ObjectNode asJson() {
+            ObjectNode n = factory.objectNode();
+            n.set("name",factory.textNode(getName()));
+            n.set("value",factory.numberNode(value));
+            n.set("text",factory.textNode(getTextValue()));
+            return n;
         }
     }
 
@@ -130,11 +164,11 @@ public class HexCodes extends Unit {
     }
 
 
-    public HexCodes add(int value, String desc) {
+    public HexCodes add(int codeValue, String codeName) {
         if ( bitRangeContextList.isEmpty() ) {
             bitRangeContextList.add( new BitRangeContext() );
         }
-        bitRangeContextList.get(bitRangeContextList.size() -1).flags.add( Pair.of(value,desc) );
+        bitRangeContextList.get(bitRangeContextList.size() -1).codes.add( new BitRangeCode(codeName,codeValue) );
         return this;
     }
 
@@ -153,8 +187,8 @@ public class HexCodes extends Unit {
 
     public ArrayNode asJson(BigInteger codes) {
         ArrayNode n = factory.arrayNode();
-        for (BitRangeContext.Value v : valueToCodes((BigInteger) codes)) {
-            n.add(v.asJson());
+        for (BitRangeCodes c : valueToCodes((BigInteger) codes)) {
+            n.add(c.asJson());
         }
         return n;
     }
@@ -164,26 +198,21 @@ public class HexCodes extends Unit {
     public String asString(Object val) {
         StringBuilder sb = new StringBuilder();
         if ( val != null ) {
-            for (BitRangeContext.Value v : valueToCodes((BigInteger) val)) {
+            for (BitRangeCodes c : valueToCodes((BigInteger) val)) {
                 if (sb.length() != 0) {
                     sb.append(", ");
                 }
-                String name = v.getName();
+                String name = c.getName();
                 if (name != null && !name.isEmpty()) {
                     // null if single bit range context for entire bit set of value registers
                     sb.append(name).append(": ");
                 }
-                //sb.append(String.format("0x%02X (%s)", v.value, v.getTextValue()));
-                sb.append(v.getTextValue());
+                //sb.append(String.format("0x%02X (%s)", c.value, c.getTextValue()));
+                sb.append(c.getTextValue());
             }
         }
         return sb.toString();
     }
-
-
-    //public HexCodes bitRange(int start, int end) {
-    //    return bitRange(start,end,"");
-    //}
 
 
     public HexCodes bitRange(int start, int end, String desc) {
@@ -202,30 +231,30 @@ public class HexCodes extends Unit {
 
 
     public Map<String,Integer> codesByName(String bitRangeName) {
-        return bitRangeContextList.stream().filter(brc->bitRangeName.equals(brc.name)).findFirst().map(brc->brc.flags).get().stream().collect(Collectors.toMap(Pair::getValue,Pair::getKey));
+        return bitRangeContextList.stream().filter(brc->bitRangeName.equals(brc.name)).findFirst().map(brc->brc.codes).get().stream().collect(Collectors.toMap(BitRangeCode::getName, BitRangeCode::getValue));
     }
 
 
     public int findById(Object id) throws EpeverException {
         int code = Integer.parseInt(id.toString());
-        return findByFilter( code, (idAndName) -> idAndName.getKey().intValue() == code );
+        return findByFilter( code, (idAndName) -> idAndName.getValue().intValue() == code );
     }
 
     public int findByName(final String codeName ) throws EpeverException {
 
-        return findByFilter( codeName, (idAndName) -> idAndName.getValue().equalsIgnoreCase(codeName.trim()) );
+        return findByFilter( codeName, (idAndName) -> idAndName.getName().equalsIgnoreCase(codeName.trim()) );
     }
 
-    public int findByFilter(Object key, Predicate<Pair<Integer,String>> filter ) throws EpeverException {
+    public int findByFilter(Object key, Predicate<BitRangeCode> filter ) throws EpeverException {
         if ( key == null ) {
             throw new EpeverException("Code lookup attempted with null key for '" + this.name + "'");
         } else if ( bitRangeContextList.size() > 1 ) {
             throw new EpeverException(this.name + " has multiple bit ranges defined.  The bit range name must also be specified (use findByBitRangeAndName)");
         }
         BitRangeContext brc = bitRangeContextList.get(0);
-        for( Pair<Integer,String> pair : brc.flags) {
-            if ( filter.test(pair) ) {
-                return pair.getKey();
+        for( BitRangeCode code : brc.codes) {
+            if ( filter.test(code) ) {
+                return code.getValue();
             }
         }
         throw new EpeverException("Invalid choice: " + key + ".  " + getDescription());
@@ -251,7 +280,7 @@ public class HexCodes extends Unit {
 
         for (int i = 0; i < bitRangeContextList.size(); i++ ) {
             BitRangeContext bitRange = bitRangeContextList.get(i);
-            if ( !bitRange.flags.isEmpty() ) {
+            if ( !bitRange.codes.isEmpty() ) {
                 if ( i != 0 ) {
                     sb.append(", ");
                 }
@@ -263,12 +292,12 @@ public class HexCodes extends Unit {
                     sb.append("-").append(bitRange.end);
                 }
                 sb.append("): [");
-                for( int j = 0; j < bitRange.flags.size(); j++ ) {
-                    Pair flag = bitRange.flags.get(j);
+                for(int j = 0; j < bitRange.codes.size(); j++ ) {
+                    BitRangeCode code = bitRange.codes.get(j);
                     if ( j > 0 ) {
                         sb.append(", ");
                     }
-                    sb.append(String.format("0x%02X: %s", flag.getLeft(), flag.getRight()));
+                    sb.append(String.format("0x%02X: %s", code.getValue(), code.getName()));
 
                 }
                 sb.append("]");
@@ -277,13 +306,13 @@ public class HexCodes extends Unit {
         return sb.toString();
     }
 
-    private List<BitRangeContext.Value> valueToCodes(BigInteger val) {
-        List<BitRangeContext.Value> codeValues = new LinkedList<>();
+    private List<BitRangeCodes> valueToCodes(BigInteger val) {
+        List<BitRangeCodes> codes = new LinkedList<>();
         for(int i = 0; i < bitRangeContextList.size(); i++ ) {
             BitRangeContext brc = bitRangeContextList.get(i);
-            codeValues.add( brc.getValue(val) );
+            codes.add( brc.getValue(val) );
         }
-        return codeValues;
+        return codes;
     }
 
 }
