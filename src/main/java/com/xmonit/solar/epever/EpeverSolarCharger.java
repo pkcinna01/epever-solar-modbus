@@ -57,18 +57,18 @@ public class EpeverSolarCharger extends SolarCharger {
     }
 
 
+    protected long connectTimeMs = 0;
+
     @Override
     public synchronized void connect() throws ModbusIOException {
-        connectNow();
-    }
-
-    public void connectNow() throws ModbusIOException {
         modbusMaster.connect();
+        connectTimeMs = System.currentTimeMillis();
         //modbusMaster.setResponseTimeout(15000); //TBD - this is redundant but sometimes reads don't timeout
     }
 
     @Override
     public synchronized void disconnect() throws ModbusIOException {
+        connectTimeMs = 0;
         disconnectNow();
 
     }
@@ -82,6 +82,12 @@ public class EpeverSolarCharger extends SolarCharger {
     public boolean isConnected() throws ModbusIOException {
         return modbusMaster.isConnected();
     }
+
+    @Override
+    public long getConnectTimeMs() {
+        return connectTimeMs;
+    }
+
 
 
     @Override

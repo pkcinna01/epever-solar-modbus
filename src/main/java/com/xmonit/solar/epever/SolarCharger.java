@@ -79,21 +79,30 @@ abstract public class SolarCharger {
         public void run() throws Exception;
     }
 
-    public synchronized SolarCharger withConnection( ConnectionOp op ) throws Exception {
-        boolean priorConnection = this.isConnected();
+    abstract public long getConnectTimeMs();
+
+    public long maxConnectionAgeMs = -1;
+
+    protected boolean isConnectionExpired() throws Exception {
+        return !isConnected() || (maxConnectionAgeMs > 0 && System.currentTimeMillis() - getConnectTimeMs() > maxConnectionAgeMs);
+    }
+
+    public void reconnect() throws EpeverException {
         try {
-            if ( !priorConnection ) {
-                this.connect();
+            if (isConnected()) {
+                disconnect();
             }
-            try {
-                op.run();
-            } catch (Exception ex) {
-                throw ex;
-            }
-        } finally {
-            if ( !priorConnection )
-            this.disconnect();
+            connect();
+        } catch (Exception ex) {
+            throw new EpeverException("Failed reconnecting charger '" + getId() + "'", ex);
         }
+    }
+
+    public synchronized SolarCharger withConnection( ConnectionOp op ) throws Exception {
+        if ( isConnectionExpired() ) {
+            reconnect();
+        }
+        op.run();
         return this;
     }
 

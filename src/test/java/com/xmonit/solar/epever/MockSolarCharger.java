@@ -1,23 +1,23 @@
 package com.xmonit.solar.epever;
 
 import com.intelligt.modbus.jlibmodbus.exception.ModbusIOException;
-import com.intelligt.modbus.jlibmodbus.serial.SerialPortException;
-
-import java.util.List;
 
 public class MockSolarCharger extends SolarCharger {
 
 
     boolean connected = false;
+    protected long connectTimeMs = 0;
 
     @Override
     public void connect() throws ModbusIOException {
         connected = true;
+        connectTimeMs = System.currentTimeMillis();
     }
 
     @Override
     public void disconnect() throws ModbusIOException {
         connected = false;
+        connectTimeMs = 0;
     }
 
     @Override
@@ -62,5 +62,10 @@ public class MockSolarCharger extends SolarCharger {
     @Override
     public void writeCoils(int addr, boolean[] coils) throws EpeverException {
 
+    }
+
+    @Override
+    public long getConnectTimeMs() {
+        return 0;
     }
 }
